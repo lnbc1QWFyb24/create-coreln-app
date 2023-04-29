@@ -9,11 +9,20 @@
     connectionStatus$ = ln.connectionStatus$
   }
 
-  let address: string
-  let rune: string
+  $: {
+    if ($connectionStatus$ === 'connected') {
+      modalOpen = false
+    }
+  }
+
+  let address = '03093b030028e642fc3b9a05c8eb549f202958e92143da2e85579b92ef0f49cc7d@localhost:7272'
+  let rune = '7OQKm3FL-zIftx1z29E7KFGyVOgAY54ZyeWRtx8e2Q09MQ=='
   let method: string
   let params: string
   let result: string
+
+  let modalOpen = false
+  let connecting = false
 
   async function connect() {
     const { publicKey, ip, port } = parseNodeAddress(address)
@@ -38,7 +47,9 @@
     })
 
     // initiate the connection to the remote node
+    connecting = true
     await ln.connect()
+    connecting = false
   }
 
   async function request() {
@@ -62,31 +73,56 @@
   }
 </script>
 
-<main class="w-screen h-screen flex items-center justify-center p-6 relative">
+<header class="absolute flex justify-between p-6 w-full items-center">
+  <h1 class="font-bold text-3xl">ROYGBIV</h1>
   {#if ln}
-    <div class="absolute top-1 right-1 px-2 py-1 border-green-600 rounded border text-sm">
+    <div class="text-sm">
       Browser Id: {`${ln.publicKey.slice(0, 8)}...${ln.publicKey.slice(-8)}`}
     </div>
   {/if}
+</header>
 
-  <div class="w-1/2 max-w-lg">
-    <h1 class="font-bold text-3xl mb-4 w-full text-center">Create CoreLN App</h1>
-    <div class="w-full mt-4 text-sm p-4 border-2 rounded border-purple-300">
-      <label class="text-neutral-600 font-medium mb-1 block" for="address">Address</label>
-      <textarea
-        id="address"
-        class="border w-full p-2 rounded"
-        rows="3"
-        bind:value={address}
-        placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
-      />
-
-      <div class="flex items-center justify-between w-full">
+<main class="w-screen h-screen flex flex-col items-center justify-center p-4 relative">
+  <!-- Modal -->
+  {#if modalOpen}
+    <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div
+        class="p-4 cursor-pointer absolute top-2 right-2 right"
+        on:click={() => (modalOpen = false)}
+      >
+        X
+      </div>
+      <h1 class="text-lg">Connect your Node</h1>
+      <!-- Address -->
+      <div class="mt-4 w-full text-sm">
+        <label class="font-medium mb-1 block" for="address">Address</label>
+        <textarea
+          id="address"
+          class="border w-full p-2 rounded"
+          rows="3"
+          bind:value={address}
+          placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
+        />
+      </div>
+      <!-- Rune -->
+      <div class="w-full mt-4 text-sm">
+        <label class="font-medium mb-1 block" for="rune">Rune</label>
+        <textarea
+          id="rune"
+          class="border w-full p-2 rounded"
+          rows="2"
+          bind:value={rune}
+          placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
+        />
+      </div>
+      <!-- Connect Button -->
+      <div class="flex items-center justify-between w-full mt-4">
         <button
           on:click={connect}
           disabled={!address}
-          class="mt-2 border border-purple-500 rounded py-1 px-4 disabled:opacity-20 hover:shadow-md active:shadow-none"
-          >Connect</button
+          class="border border-purple-500 rounded py-1 px-4 disabled:opacity-20 hover:shadow-md active:shadow-none"
+          >{$connectionStatus$ === 'connecting' ? '...' : 'Connect'}</button
         >
 
         {#if connectionStatus$}
@@ -103,60 +139,11 @@
         {/if}
       </div>
     </div>
+  {/if}
 
-    <div class="w-full mt-8 text-sm p-4 border-2 rounded border-yellow-300">
-      <label class="text-neutral-600 font-medium mb-1 block" for="rune">Rune</label>
-      <textarea
-        id="rune"
-        class="border w-full p-2 rounded"
-        rows="2"
-        bind:value={rune}
-        placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
-      />
+  {#if !modalOpen && $connectionStatus$ !== 'connected'}
+    <div class="">
+      <button on:click={() => (modalOpen = !modalOpen)}>OPEN MODAL</button>
     </div>
-
-    <div class="p-4 border-2 rounded border-orange-300 mt-8">
-      <div class="w-full text-sm">
-        <label class="text-neutral-600 font-medium mb-1 block" for="method">Method</label>
-        <input
-          id="method"
-          class="border w-full p-2 rounded"
-          type="text"
-          bind:value={method}
-          placeholder="getinfo"
-        />
-      </div>
-
-      <div class="w-full mt-4 text-sm">
-        <label class="text-neutral-600 font-medium mb-1 block" for="params">Params</label>
-        <textarea
-          id="params"
-          class="border w-full p-2 rounded"
-          rows="4"
-          bind:value={params}
-          placeholder={JSON.stringify({ key: 'value' }, null, 2)}
-        />
-      </div>
-
-      <button
-        on:click={request}
-        disabled={!connectionStatus$ || !rune || !method}
-        class="mt-2 border border-purple-500 rounded py-1 px-4 disabled:opacity-20 hover:shadow-md active:shadow-none"
-        >Request</button
-      >
-    </div>
-  </div>
-
-  <div class="w-1/2 max-w-xl p-4 border-2 rounded border-green-300 ml-4">
-    <div class="w-full text-sm">
-      <label class="text-neutral-600 font-medium mb-1 block" for="params">Result</label>
-      <textarea
-        id="params"
-        class="border w-full p-2 rounded"
-        rows="20"
-        value={result || ''}
-        placeholder={JSON.stringify({ key: 'value' }, null, 2)}
-      />
-    </div>
-  </div>
+  {/if}
 </main>
