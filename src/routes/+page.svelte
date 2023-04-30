@@ -1,6 +1,15 @@
 <script lang="ts">
   import Lnmessage from 'lnmessage'
-  import { parseNodeAddress } from './utils.js'
+  import { parseNodeAddress } from '../utils.js'
+  import Header from '../components/Header.svelte'
+  import Slide from '../components/Slide.svelte'
+  import type { Info, Prism } from '../types.js'
+  import { fade } from 'svelte/transition'
+  import Qr from '../components/QR.svelte'
+  import close from '../icons/close.js'
+  import Button from '../components/Button.svelte'
+  import Icon from '../components/Icon/Icon.svelte'
+
 
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
@@ -9,11 +18,35 @@
     connectionStatus$ = ln.connectionStatus$
   }
 
-  let address: string
-  let rune: string
-  let method: string
-  let params: string
-  let result: string
+  let address = ''
+  let rune = ''
+  let bolt12 = ''
+  let info: Info
+
+  let modalOpen: 'connect' | 'qr' | null = null
+  let connecting = false
+
+  type Slides = typeof slides
+  type SlideStep = Slides[number]
+  type SlideDirection = 'right' | 'left'
+
+  const slides = ['0', '1', '2', 'summary'] as const
+  let slide: SlideStep = '0'
+  let previousSlide: SlideStep = '0'
+
+  $: slideDirection = (
+    slides.indexOf(previousSlide) > slides.indexOf(slide) ? 'right' : 'left'
+  ) as SlideDirection
+
+  function back() {
+    previousSlide = slides[slides.indexOf(slide) - 2]
+    slide = slides[slides.indexOf(slide) - 1]
+  }
+
+  function next(to = slides[slides.indexOf(slide) + 1]) {
+    previousSlide = slide
+    slide = to
+  }
 
   async function connect() {
     const { publicKey, ip, port } = parseNodeAddress(address)
@@ -38,55 +71,170 @@
     })
 
     // initiate the connection to the remote node
+    connecting = true
     await ln.connect()
+    connecting = false
+    modalOpen = null
+
+    const infoResult = await request('getinfo')
+    info = infoResult as Info
   }
 
-  async function request() {
-    let parsedParams: unknown | undefined
-
+  async function request(method: string, params?: unknown): Promise<unknown> {
     try {
-      parsedParams = params ? JSON.parse(params) : undefined
-
-      const requestResult = await ln.commando({
+      const result = await ln.commando({
         method,
-        params: parsedParams,
+        params,
         rune
       })
 
-      result = JSON.stringify(requestResult, null, 2)
+      return result
     } catch (error) {
       const { message } = error as { message: string }
-      alert(message)
-      return
+      console.log(message)
+    }
+  }
+
+  async function createPrism(prism: Prism) {
+    try {
+      const result = await request('createprism', prism)
+      bolt12 = (result as { bolt12: string }).bolt12
+    } catch (error) {
+      console.log(error)
     }
   }
 </script>
 
-<main class="w-screen h-screen flex items-center justify-center p-6 relative">
-  {#if ln}
-    <div class="absolute top-1 right-1 px-2 py-1 border-green-600 rounded border text-sm">
-      Browser Id: {`${ln.publicKey.slice(0, 8)}...${ln.publicKey.slice(-8)}`}
+<svelte:head>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap"
+    rel="stylesheet"
+  />
+</svelte:head>
+<main class="w-screen h-screen flex flex-col items-center justify-center relative">
+  <Header {info} />
+
+  <!-- Button to open connect modal -->
+  {#if $connectionStatus$ !== 'connected' && !modalOpen}
+    <div class="">
+      <Button on:click={() => (modalOpen = !modalOpen)} icon="ArrowUpCircle">
+        Connect
+      </Button>
+    </div>
+  {/if}
+  <!-- Modal -->
+  {#if modalOpen}
+    <div
+      class="w-full h-full top-0 backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
+    >
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div class="p-4 cursor-pointer absolute top-4 right-4 text-white w-6 h-6" on:click={() => (modalOpen = false)}>
+        <Icon icon="Cross" /> X
+      </div>
+      <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
+        <h1 class="text-lg">Connect your Node</h1>
+        <!-- Address -->
+        <div class="mt-4 w-full text-sm">
+          <label class="font-medium mb-1 block" for="address">Address</label>
+          <textarea
+            id="address"
+            class="border w-full p-2 rounded"
+            rows="3"
+            bind:value={address}
+            placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
+          />
+        </div>
+        <!-- Rune -->
+        <div class="w-full mt-4 text-sm">
+          <label class="font-medium mb-1 block" for="rune">Rune</label>
+          <textarea
+            id="rune"
+            class="border w-full p-2 rounded"
+            rows="2"
+            bind:value={rune}
+            placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
+          />
+        </div>
+        <!-- Connect Button -->
+        <div class="flex items-center justify-between w-full mt-4">
+          <Button
+            on:click={connect}
+            disabled={!address}
+            >
+              {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
+          </Button>
+        </div>
+      </div>
     </div>
   {/if}
 
-  <div class="w-1/2 max-w-lg">
-    <h1 class="font-bold text-3xl mb-4 w-full text-center">Create CoreLN App</h1>
-    <div class="w-full mt-4 text-sm p-4 border-2 rounded border-purple-300">
-      <label class="text-neutral-600 font-medium mb-1 block" for="address">Address</label>
-      <textarea
-        id="address"
-        class="border w-full p-2 rounded"
-        rows="3"
-        bind:value={address}
-        placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
-      />
+  <!-- Prism Steps -->
+  {#if $connectionStatus$ === 'connected'}
+    <div class="border max-w-lg w-full p-10">
+      {#if slide === '0'}
+        <Slide direction={slideDirection}>
+          Create Prisom
+          <button class="border p-2" on:click={() => next()}>Next</button>
+        </Slide>
+      {/if}
+      {#if slide === '1'}
+        <Slide direction={slideDirection}>
+          <button class="border p-2" on:click={() => back()}>Back</button>
+          Add Members
+          <button class="border p-2" on:click={() => next()}>Next</button>
+        </Slide>
+      {/if}
+      {#if slide === '2'}
+        <Slide direction={slideDirection}
+          ><button class="border p-2" on:click={() => back()}>Back</button>Finish</Slide
+        >
+      {/if}
+    </div>
+  {/if}
+</main>
 
-      <div class="flex items-center justify-between w-full">
+<!-- MODALS -->
+{#if modalOpen === 'connect'}
+  <div
+    transition:fade
+    class="w-full h-full top-0 absolute backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
+  >
+    <button class="w-8 cursor-pointer absolute top-4 right-4" on:click={() => (modalOpen = null)}>
+      {@html close}
+    </button>
+    <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
+      <h1 class="text-lg">Connect your Node</h1>
+      <!-- Address -->
+      <div class="mt-4 w-full text-sm">
+        <label class="font-medium mb-1 block" for="address">Address</label>
+        <textarea
+          id="address"
+          class="border w-full p-2 rounded"
+          rows="3"
+          bind:value={address}
+          placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
+        />
+      </div>
+      <!-- Rune -->
+      <div class="w-full mt-4 text-sm">
+        <label class="font-medium mb-1 block" for="rune">Rune</label>
+        <textarea
+          id="rune"
+          class="border w-full p-2 rounded"
+          rows="2"
+          bind:value={rune}
+          placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
+        />
+      </div>
+      <!-- Connect Button -->
+      <div class="flex items-center justify-between w-full mt-4">
         <button
           on:click={connect}
           disabled={!address}
-          class="mt-2 border border-purple-500 rounded py-1 px-4 disabled:opacity-20 hover:shadow-md active:shadow-none"
-          >Connect</button
+          class="border border-purple-500 rounded py-1 px-4 disabled:opacity-20 hover:shadow-md active:shadow-none"
+          >{$connectionStatus$ === 'connecting' ? '...' : 'Connect'}</button
         >
 
         {#if connectionStatus$}
@@ -103,60 +251,18 @@
         {/if}
       </div>
     </div>
-
-    <div class="w-full mt-8 text-sm p-4 border-2 rounded border-yellow-300">
-      <label class="text-neutral-600 font-medium mb-1 block" for="rune">Rune</label>
-      <textarea
-        id="rune"
-        class="border w-full p-2 rounded"
-        rows="2"
-        bind:value={rune}
-        placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
-      />
-    </div>
-
-    <div class="p-4 border-2 rounded border-orange-300 mt-8">
-      <div class="w-full text-sm">
-        <label class="text-neutral-600 font-medium mb-1 block" for="method">Method</label>
-        <input
-          id="method"
-          class="border w-full p-2 rounded"
-          type="text"
-          bind:value={method}
-          placeholder="getinfo"
-        />
-      </div>
-
-      <div class="w-full mt-4 text-sm">
-        <label class="text-neutral-600 font-medium mb-1 block" for="params">Params</label>
-        <textarea
-          id="params"
-          class="border w-full p-2 rounded"
-          rows="4"
-          bind:value={params}
-          placeholder={JSON.stringify({ key: 'value' }, null, 2)}
-        />
-      </div>
-
-      <button
-        on:click={request}
-        disabled={!connectionStatus$ || !rune || !method}
-        class="mt-2 border border-purple-500 rounded py-1 px-4 disabled:opacity-20 hover:shadow-md active:shadow-none"
-        >Request</button
-      >
-    </div>
   </div>
+{/if}
 
-  <div class="w-1/2 max-w-xl p-4 border-2 rounded border-green-300 ml-4">
-    <div class="w-full text-sm">
-      <label class="text-neutral-600 font-medium mb-1 block" for="params">Result</label>
-      <textarea
-        id="params"
-        class="border w-full p-2 rounded"
-        rows="20"
-        value={result || ''}
-        placeholder={JSON.stringify({ key: 'value' }, null, 2)}
-      />
-    </div>
+{#if modalOpen === 'qr'}
+  <div
+    transition:fade
+    class="w-full h-full top-0 absolute backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
+  >
+    <button class="w-8 cursor-pointer absolute top-4 right-4" on:click={() => (modalOpen = null)}>
+      {@html close}
+    </button>
+
+    <Qr value={bolt12} />
   </div>
-</main>
+{/if}
