@@ -6,6 +6,8 @@
   import { goto } from '$app/navigation'
   import type { Info, Prism } from '../types.js'
   import { fade } from 'svelte/transition'
+  import Qr from '../components/QR.svelte'
+  import close from '../icons/close.js'
 
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
@@ -14,17 +16,13 @@
     connectionStatus$ = ln.connectionStatus$
   }
 
-  $: {
-    if ($connectionStatus$ === 'connected') {
-      modalOpen = null
-    }
-  }
-
   // let address = ''
   // let rune = ''
   let address = '0211339e6b9db0e7e14d19bcd612d06ba26f793e8d049ebe9a99a3966668f4d81f@localhost:7272'
   let rune = '0Ew8MyncAizPDi6rs8fp4vJCl7mQYNA8fVew2lwTFnE9NQ=='
-  let bolt12 = ''
+  // let bolt12 = ''
+  let bolt12 =
+    'lno1qgsqvgnwgcg35z6ee2h3yczraddm72xrfua9uve2rlrm9deu7xyfzrc2q32xjurnzgpyzsskyyppzvu7dwwmpelpf5vme4sj6p46ymme86xsf847n2v689nxdr6ds8c'
   let info: Info
 
   let modalOpen: 'connect' | 'qr' | null = null
@@ -78,9 +76,12 @@
     connecting = true
     await ln.connect()
     connecting = false
+    modalOpen = null
 
     const infoResult = await request('getinfo')
     info = infoResult as Info
+
+    modalOpen = 'qr'
   }
 
   async function request(method: string, params?: unknown): Promise<unknown> {
@@ -159,9 +160,8 @@
     transition:fade
     class="w-full h-full top-0 absolute backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
   >
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <button class="p-4 cursor-pointer absolute top-4 right-4" on:click={() => (modalOpen = null)}>
-      X
+    <button class="w-8 cursor-pointer absolute top-4 right-4" on:click={() => (modalOpen = null)}>
+      {@html close}
     </button>
     <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
       <h1 class="text-lg">Connect your Node</h1>
@@ -210,5 +210,18 @@
         {/if}
       </div>
     </div>
+  </div>
+{/if}
+
+{#if modalOpen === 'qr'}
+  <div
+    transition:fade
+    class="w-full h-full top-0 absolute backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
+  >
+    <button class="w-8 cursor-pointer absolute top-4 right-4" on:click={() => (modalOpen = null)}>
+      {@html close}
+    </button>
+
+    <Qr value={bolt12} />
   </div>
 {/if}
