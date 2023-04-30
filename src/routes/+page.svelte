@@ -103,18 +103,19 @@
   <!-- Button to open connect modal -->
   {#if $connectionStatus$ !== 'connected' && !modalOpen}
     <div class="">
-      <Button on:click={() => (modalOpen = !modalOpen)} icon="ArrowUpCircle">
-        Connect
-      </Button>
+      <Button on:click={() => (modalOpen = 'connect')} icon="ArrowUpCircle">Connect</Button>
     </div>
   {/if}
   <!-- Modal -->
-  {#if modalOpen}
+  {#if modalOpen === 'connect'}
     <div
       class="w-full h-full top-0 backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
     >
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div class="p-4 cursor-pointer absolute top-4 right-4 text-white w-6 h-6" on:click={() => (modalOpen = false)}>
+      <div
+        class="p-4 cursor-pointer absolute top-4 right-4 text-white w-6 h-6"
+        on:click={() => (modalOpen = null)}
+      >
         <Icon icon="Cross" /> X
       </div>
       <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
@@ -143,11 +144,8 @@
         </div>
         <!-- Connect Button -->
         <div class="flex items-center justify-between w-full mt-4">
-          <Button
-            on:click={connect}
-            disabled={!address}
-            >
-              {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
+          <Button on:click={connect} disabled={!address}>
+            {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
           </Button>
         </div>
       </div>
