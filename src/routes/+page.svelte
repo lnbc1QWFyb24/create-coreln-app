@@ -2,6 +2,7 @@
   import Lnmessage from 'lnmessage'
   import { parseNodeAddress } from './utils.js'
   import Header from '../components/Header.svelte';
+    import Button from '../components/Button.svelte'
 
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
@@ -95,14 +96,13 @@
 <main class="w-screen h-screen flex flex-col items-center justify-center relative">
   
   <Header ln={ln} />
-
   
   <!-- Button to open connect modal -->
   {#if $connectionStatus$ !== 'connected' && !modalOpen}
     <div class="">
-      <button class="px-4 py-2 border rounded" on:click={() => (modalOpen = !modalOpen)}
-        >Connect</button
-      >
+      <Button on:click={() => (modalOpen = !modalOpen)}>
+        Connect
+      </Button>
     </div>
   {/if}
   <!-- Modal -->
