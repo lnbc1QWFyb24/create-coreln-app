@@ -4,9 +4,10 @@
     export let format:string = 'primary'
     export let disabled:boolean = false
     export let icon:string|null = null
+    export let fill:boolean = false
 </script>
 
-<button class={"rounded p-[2px]" + " " + format} on:click disabled={disabled}>
+<button class={"rounded p-[2px]" + " " + format} on:click disabled={disabled} class:fill>
     <span class="bg-black p-2 rounded flex flex-row items-center justify-center align-center gap-2">
         <p class="">
             <slot /> 
@@ -39,5 +40,9 @@
 
     .primary:disabled {
         @apply opacity-50;
+    }
+
+    .fill {
+        @apply w-full;
     }
 </style>

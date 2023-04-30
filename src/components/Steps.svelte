@@ -59,7 +59,7 @@ import Slide from './Slide.svelte'
   function addMember() {}
 </script>
 
-<div class="border max-w-lg w-full p-10">
+<div class="border rounded max-w-6xl w-full p-10">
   {#if slide === '0'}
     <Slide direction={slideDirection}>
       <div class="mt-4 w-full text-sm slide-content">
@@ -77,49 +77,52 @@ import Slide from './Slide.svelte'
   {/if}
   {#if slide === '1'}
     <Slide direction={slideDirection}>
-      <button class="px-4 py-2 border rounded" on:click={() => back()}>Back</button>
-      {#each members as member}
-        <div class="flex flex-col flex-wrap border">
-          <div class="m-2">
-            <div class="mt-4 w-full text-sm flex flex-col gap-4">
-              <label class="font-medium mb-1 block" for="address">Name</label>
-              <textarea
-                id="address"
-                class="border w-full p-2 rounded"
-                rows="1"
-                bind:value={member.name}
-                placeholder=""
-              />
-            </div>
-            <div class="mt-4 w-full text-sm">
-              <label class="font-medium mb-1 block" for="address">Destination</label>
-              <textarea
-                id="address"
-                class="border w-full p-2 rounded"
-                rows="1"
-                bind:value={member.destination}
-                placeholder="pubkey"
-              />
-            </div>
-            <div class="mt-4 w-full text-sm">
-              <label class="font-medium mb-1 block" for="address">Split</label>
-              <input
-                id="address"
-                class="border w-full p-2 rounded"
-                type="number"
-                bind:value={member.split}
-                placeholder="weight"
-              />
-            </div>
-            <div class="mt-4 w-full text-sm">
-              <label class="font-medium mb-1 block" for="address">Share</label>
-              {member.percentage.toFixed(1)}%
-            </div>
+      <div class="flex flex-row gap-4 w-full mb-8">
+        {#each members as member}
+          <div class="flex flex-wrap border border-gray-600 basis-1/2 p-6 rounded">
+              <div class="mt-4 w-full text-sm flex flex-col gap-4">
+                <h3>Member</h3>
+                <label class="font-medium mb-1 block" for="address">Name</label>
+                <textarea
+                  id="address"
+                  class="border w-full p-2 rounded w-full"
+                  rows="1"
+                  cols="200"
+                  bind:value={member.name}
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-4 w-full text-sm">
+                <label class="font-medium mb-1 block" for="address">Destination</label>
+                <textarea
+                  id="address"
+                  class="border w-full p-2 rounded"
+                  rows="1"
+                  bind:value={member.destination}
+                  placeholder="pubkey"
+                />
+              </div>
+              <div class="mt-4 w-full text-sm">
+                <label class="font-medium mb-1 block" for="address">Split</label>
+                <input
+                  id="address"
+                  class="border w-full p-2 rounded"
+                  type="number"
+                  bind:value={member.split}
+                  placeholder="weight"
+                />
+              </div>
+              <div class="mt-4 w-full text-sm">
+                <label class="font-medium mb-1 block" for="address">Share</label>
+                {member.percentage.toFixed(1)}%
+              </div>
           </div>
-        </div>
-      {/each}
-
-      <Button icon="ArrowRight" on:click={() => next()}>Next</Button>
+        {/each}
+      </div>
+      <div class="flex gap-2 w-full items-end justify-end">
+        <Button format="secondary" on:click={() => back()}>Back</Button>
+        <Button icon="ArrowRight" on:click={() => next()}>Next</Button>
+      </div> 
     </Slide>
   {/if}
   {#if slide === '2'}
