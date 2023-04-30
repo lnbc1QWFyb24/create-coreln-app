@@ -28,18 +28,30 @@
     {
       name: '',
       destination: '',
-      split: 0
+      split: 0,
+      percentage: 0
     },
     {
       name: '',
       destination: '',
-      split: 0
+      split: 0,
+      percentage: 0
     }
   ]
 
+  // Calaculate percentages for each member
   $: {
-    console.log('PRISM NAME = ', prismName)
-    console.log('MEMBERS = ', members)
+    if (members) {
+      const allSplits = members.map((member) => member.split).reduce((a, b) => a + b)
+      const updatedMembers = members.map((member) => {
+        return {
+          ...member,
+          percentage: member.split ? (member.split / allSplits) * 100 : 0
+        }
+      })
+
+      members = updatedMembers
+    }
   }
 
   // @TODO
@@ -90,13 +102,17 @@
             </div>
             <div class="mt-4 w-full text-sm">
               <label class="font-medium mb-1 block" for="address">Split</label>
-              <textarea
+              <input
                 id="address"
                 class="border w-full p-2 rounded"
-                rows="1"
+                type="number"
                 bind:value={member.split}
                 placeholder="weight"
               />
+            </div>
+            <div class="mt-4 w-full text-sm">
+              <label class="font-medium mb-1 block" for="address">Share</label>
+              {member.percentage.toFixed(1)}%
             </div>
           </div>
         </div>
