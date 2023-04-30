@@ -3,7 +3,6 @@
   import { parseNodeAddress } from '../utils.js'
   import Header from '../components/Header.svelte'
   import Slide from '../components/Slide.svelte'
-  import { goto } from '$app/navigation'
   import type { Info, Prism } from '../types.js'
   import { fade } from 'svelte/transition'
   import Qr from '../components/QR.svelte'
@@ -16,13 +15,9 @@
     connectionStatus$ = ln.connectionStatus$
   }
 
-  // let address = ''
-  // let rune = ''
-  let address = '0211339e6b9db0e7e14d19bcd612d06ba26f793e8d049ebe9a99a3966668f4d81f@localhost:7272'
-  let rune = '0Ew8MyncAizPDi6rs8fp4vJCl7mQYNA8fVew2lwTFnE9NQ=='
-  // let bolt12 = ''
-  let bolt12 =
-    'lno1qgsqvgnwgcg35z6ee2h3yczraddm72xrfua9uve2rlrm9deu7xyfzrc2q32xjurnzgpyzsskyyppzvu7dwwmpelpf5vme4sj6p46ymme86xsf847n2v689nxdr6ds8c'
+  let address = ''
+  let rune = ''
+  let bolt12 = ''
   let info: Info
 
   let modalOpen: 'connect' | 'qr' | null = null
@@ -80,8 +75,6 @@
 
     const infoResult = await request('getinfo')
     info = infoResult as Info
-
-    modalOpen = 'qr'
   }
 
   async function request(method: string, params?: unknown): Promise<unknown> {
