@@ -5,8 +5,8 @@
 </script>
 
 <header class="absolute top-0 flex justify-between p-6 w-full items-center">
-  <h1 class="font-black text-3xl">ROYGBIV</h1>
   {#if info}
+    <h1 class="font-black text-3xl">ROYGBIV</h1>
     <div class="flex items-center">
       <div
         style="background-color: #{info.color};"

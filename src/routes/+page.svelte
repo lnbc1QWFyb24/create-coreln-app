@@ -9,6 +9,7 @@
   import close from '../icons/close.js'
   import Button from '../components/Button.svelte'
   import Icon from '../components/Icon/Icon.svelte'
+  import prism from '../icons/prism.js'
 
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
@@ -99,13 +100,24 @@
 <main class="w-screen h-screen flex flex-col items-center justify-center relative">
   <Header {info} />
 
-  <!-- Button to open connect modal -->
-  {#if $connectionStatus$ !== 'connected' && !modalOpen}
-    <div class="">
-      <Button on:click={() => (modalOpen = 'connect')} icon="ArrowUpCircle">Connect</Button>
+  {#if !info}
+    <div class="mb-8">
+      {@html prism}
     </div>
   {/if}
-  
+
+  <!-- Button to open connect modal -->
+  {#if $connectionStatus$ !== 'connected' && !modalOpen}
+    <div class="flex flex-col items-center justify-center">
+      <Button on:click={() => (modalOpen = 'connect')} icon="ArrowUpCircle">Connect</Button>
+
+      <p class="max-w-md mt-8 text-center">
+        ROYGBIV creates lightning prisms, which are special BOLT12 offers. Any payments received to
+        these offers will split out to multiple recipients. Connect your Core Lightning node to get
+        started.
+      </p>
+    </div>
+  {/if}
 
   <!-- Prism Steps -->
   {#if $connectionStatus$ === 'connected'}
@@ -115,51 +127,51 @@
 
 <!-- Modal -->
 {#if modalOpen === 'connect'}
-<div
-transition:fade
-  class="w-full h-full absolute top-0 bg-black/30 flex flex-col items-center justify-center z-10"
->
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div
-    class="p-4 cursor-pointer absolute top-4 right-4 text-white"
-    on:click={() => (modalOpen = null)}
+    transition:fade
+    class="w-full h-full bg-black absolute top-0 bg-black/30 flex flex-col items-center justify-center z-10"
   >
-    <div class="w-6 h-6">
-      <Icon icon="Cross" />
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div
+      class="p-4 cursor-pointer absolute top-4 right-4 text-white"
+      on:click={() => (modalOpen = null)}
+    >
+      <div class="w-6 h-6">
+        <Icon icon="Cross" />
+      </div>
+    </div>
+    <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
+      <h1 class="text-lg">Connect your Node</h1>
+      <!-- Address -->
+      <div class="mt-4 w-full text-sm">
+        <label class="font-medium mb-1 block" for="address">Address</label>
+        <textarea
+          id="address"
+          class="border w-full p-2 rounded"
+          rows="3"
+          bind:value={address}
+          placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
+        />
+      </div>
+      <!-- Rune -->
+      <div class="w-full mt-4 text-sm">
+        <label class="font-medium mb-1 block" for="rune">Rune</label>
+        <textarea
+          id="rune"
+          class="border w-full p-2 rounded"
+          rows="2"
+          bind:value={rune}
+          placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
+        />
+      </div>
+      <!-- Connect Button -->
+      <div class="flex items-center justify-between w-full mt-4">
+        <Button on:click={connect} disabled={!address}>
+          {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
+        </Button>
+      </div>
     </div>
   </div>
-  <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
-    <h1 class="text-lg">Connect your Node</h1>
-    <!-- Address -->
-    <div class="mt-4 w-full text-sm">
-      <label class="font-medium mb-1 block" for="address">Address</label>
-      <textarea
-        id="address"
-        class="border w-full p-2 rounded"
-        rows="3"
-        bind:value={address}
-        placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
-      />
-    </div>
-    <!-- Rune -->
-    <div class="w-full mt-4 text-sm">
-      <label class="font-medium mb-1 block" for="rune">Rune</label>
-      <textarea
-        id="rune"
-        class="border w-full p-2 rounded"
-        rows="2"
-        bind:value={rune}
-        placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
-      />
-    </div>
-    <!-- Connect Button -->
-    <div class="flex items-center justify-between w-full mt-4">
-      <Button on:click={connect} disabled={!address}>
-        {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
-      </Button>
-    </div>
-  </div>
-</div>
 {/if}
 
 {#if modalOpen === 'qr'}
