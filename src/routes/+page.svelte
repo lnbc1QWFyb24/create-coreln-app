@@ -104,8 +104,10 @@
   <Header {info} />
 
   {#if !info}
-    <div class="mb-8">
-      {@html prism}
+    <div class="mb-8 flex justify-center">
+      <video src="triangle.mp4" poster="triangle.jpg" autoplay loop class="w-2/3">
+        ROYGBIV
+      </video>
     </div>
   {/if}
 
