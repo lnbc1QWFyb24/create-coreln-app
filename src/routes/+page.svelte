@@ -2,10 +2,9 @@
   import Lnmessage from 'lnmessage'
   import { parseNodeAddress } from '../utils.js'
   import Header from '../components/Header.svelte'
-  import Slide from '../components/Slide.svelte'
-  import { goto } from '$app/navigation'
   import type { Info, Prism } from '../types.js'
   import { fade } from 'svelte/transition'
+  import Steps from '../components/Steps.svelte'
 
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
@@ -22,35 +21,13 @@
 
   // let address = ''
   // let rune = ''
-  let address = '0211339e6b9db0e7e14d19bcd612d06ba26f793e8d049ebe9a99a3966668f4d81f@localhost:7272'
-  let rune = '0Ew8MyncAizPDi6rs8fp4vJCl7mQYNA8fVew2lwTFnE9NQ=='
+  let address = '03093b030028e642fc3b9a05c8eb549f202958e92143da2e85579b92ef0f49cc7d@localhost:7272'
+  let rune = 'ezpOqCBcoWT4HYOAZl84i3a5HiI08fuXPiY93U15DnE9Mw=='
   let bolt12 = ''
   let info: Info
 
   let modalOpen: 'connect' | 'qr' | null = null
   let connecting = false
-
-  type Slides = typeof slides
-  type SlideStep = Slides[number]
-  type SlideDirection = 'right' | 'left'
-
-  const slides = ['0', '1', '2', 'summary'] as const
-  let slide: SlideStep = '0'
-  let previousSlide: SlideStep = '0'
-
-  $: slideDirection = (
-    slides.indexOf(previousSlide) > slides.indexOf(slide) ? 'right' : 'left'
-  ) as SlideDirection
-
-  function back() {
-    previousSlide = slides[slides.indexOf(slide) - 2]
-    slide = slides[slides.indexOf(slide) - 1]
-  }
-
-  function next(to = slides[slides.indexOf(slide) + 1]) {
-    previousSlide = slide
-    slide = to
-  }
 
   async function connect() {
     const { publicKey, ip, port } = parseNodeAddress(address)
@@ -130,26 +107,7 @@
 
   <!-- Prism Steps -->
   {#if $connectionStatus$ === 'connected'}
-    <div class="border max-w-lg w-full p-10">
-      {#if slide === '0'}
-        <Slide direction={slideDirection}>
-          Create Prisom
-          <button class="border p-2" on:click={() => next()}>Next</button>
-        </Slide>
-      {/if}
-      {#if slide === '1'}
-        <Slide direction={slideDirection}>
-          <button class="border p-2" on:click={() => back()}>Back</button>
-          Add Members
-          <button class="border p-2" on:click={() => next()}>Next</button>
-        </Slide>
-      {/if}
-      {#if slide === '2'}
-        <Slide direction={slideDirection}
-          ><button class="border p-2" on:click={() => back()}>Back</button>Finish</Slide
-        >
-      {/if}
-    </div>
+    <Steps />
   {/if}
 </main>
 
