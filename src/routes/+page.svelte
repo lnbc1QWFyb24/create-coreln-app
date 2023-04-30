@@ -130,8 +130,10 @@
       class="w-full h-full top-0 backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
     >
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div class="p-4 cursor-pointer absolute top-4 right-4 text-white w-6 h-6" on:click={() => (modalOpen = false)}>
-        <Icon icon="Cross" /> X
+      <div class="p-4 cursor-pointer absolute top-4 right-4 text-white" on:click={() => (modalOpen = false)}>
+        <div class="w-6 h-6">
+          <Icon icon="Cross" />
+        </div>
       </div>
       <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
         <h1 class="text-lg">Connect your Node</h1>
