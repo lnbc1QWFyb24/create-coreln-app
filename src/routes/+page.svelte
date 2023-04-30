@@ -94,7 +94,7 @@
 </svelte:head>
 <main class="w-screen h-screen flex flex-col items-center justify-center relative">
   
-  <Header text="wooooo" ln={ln} />
+  <Header ln={ln} />
 
   
   <!-- Button to open connect modal -->
