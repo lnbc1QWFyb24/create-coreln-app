@@ -24,8 +24,8 @@
     }
   }
 
-  let address = '0314eaa0f87f844933fe6af76930b9ff3ef09c8ec7f226243d3c56dfecd758cf88@localhost:7272'
-  let rune = 'koyEoWA-Zeof6fxJXpZPpGbJAhyFU1yTErX1UBTQZyI9MQ=='
+  let address = '03093b030028e642fc3b9a05c8eb549f202958e92143da2e85579b92ef0f49cc7d@localhost:7272'
+  let rune = 'SFTxHiGlQrB2H19h7gCPzLuml3-xroW-sloI84CXRek9NQ=='
   let bolt12 = ''
   let info: Info
 
@@ -81,9 +81,11 @@
 
   async function createPrism(prism: Prism) {
     try {
+      // @TODO create bolt12 using the prism details
       const result =
         'lno1qgsqvgnwgcg35z6ee2h3yczraddm72xrfua9uve2rlrm9deu7xyfzrc2q32xjurnzgpyzsskyyppzvu7dwwmpelpf5vme4sj6p46ymme86xsf847n2v689nxdr6ds8c'
       bolt12 = result
+      modalOpen = 'qr'
       // const result = await request('createprism', prism)
       // bolt12 = (result as { bolt12: string }).bolt12
     } catch (error) {
@@ -124,7 +126,7 @@
 
   <!-- Prism Steps -->
   {#if $connectionStatus$ === 'connected'}
-    <Steps />
+    <Steps finish={(prism) => createPrism(prism)} />
   {/if}
 </main>
 

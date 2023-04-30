@@ -1,6 +1,8 @@
 <script lang="ts">
   import Button from './Button.svelte'
-import Slide from './Slide.svelte'
+  import Slide from './Slide.svelte'
+
+  export let finish = (args: any) => {} // no-operation function
 
   type Slides = typeof slides
   type SlideStep = Slides[number]
@@ -24,7 +26,7 @@ import Slide from './Slide.svelte'
     slide = to
   }
 
-  let prismName: string
+  let label: string
   let members = [
     {
       name: '',
@@ -68,7 +70,7 @@ import Slide from './Slide.svelte'
           id="address"
           class="border w-full p-2 rounded"
           rows="1"
-          bind:value={prismName}
+          bind:value={label}
           placeholder=""
         />
       </div>
@@ -80,56 +82,58 @@ import Slide from './Slide.svelte'
       <div class="flex flex-row gap-4 w-full mb-8">
         {#each members as member}
           <div class="flex flex-wrap border border-gray-600 basis-1/2 p-6 rounded">
-              <div class="mt-4 w-full text-sm flex flex-col gap-4">
-                <h3>Member</h3>
-                <label class="font-medium mb-1 block" for="address">Name</label>
-                <textarea
-                  id="address"
-                  class="border w-full p-2 rounded w-full"
-                  rows="1"
-                  cols="200"
-                  bind:value={member.name}
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-4 w-full text-sm">
-                <label class="font-medium mb-1 block" for="address">Destination</label>
-                <textarea
-                  id="address"
-                  class="border w-full p-2 rounded"
-                  rows="1"
-                  bind:value={member.destination}
-                  placeholder="pubkey"
-                />
-              </div>
-              <div class="mt-4 w-full text-sm">
-                <label class="font-medium mb-1 block" for="address">Split</label>
-                <input
-                  id="address"
-                  class="border w-full p-2 rounded"
-                  type="number"
-                  bind:value={member.split}
-                  placeholder="weight"
-                />
-              </div>
-              <div class="mt-4 w-full text-sm">
-                <label class="font-medium mb-1 block" for="address">Share</label>
-                {member.percentage.toFixed(1)}%
-              </div>
+            <div class="mt-4 w-full text-sm flex flex-col gap-4">
+              <h3>Member</h3>
+              <label class="font-medium mb-1 block" for="address">Name</label>
+              <textarea
+                id="address"
+                class="border w-full p-2 rounded w-full"
+                rows="1"
+                cols="200"
+                bind:value={member.name}
+                placeholder=""
+              />
+            </div>
+            <div class="mt-4 w-full text-sm">
+              <label class="font-medium mb-1 block" for="address">Destination</label>
+              <textarea
+                id="address"
+                class="border w-full p-2 rounded"
+                rows="1"
+                bind:value={member.destination}
+                placeholder="pubkey"
+              />
+            </div>
+            <div class="mt-4 w-full text-sm">
+              <label class="font-medium mb-1 block" for="address">Split</label>
+              <input
+                id="address"
+                class="border w-full p-2 rounded"
+                type="number"
+                bind:value={member.split}
+                placeholder="weight"
+              />
+            </div>
+            <div class="mt-4 w-full text-sm">
+              <label class="font-medium mb-1 block" for="address">Share</label>
+              {member.percentage.toFixed(1)}%
+            </div>
           </div>
         {/each}
       </div>
       <div class="flex gap-2 w-full items-end justify-end">
         <Button format="secondary" on:click={() => back()}>Back</Button>
         <Button icon="ArrowRight" on:click={() => next()}>Next</Button>
-      </div> 
+      </div>
     </Slide>
   {/if}
   {#if slide === '2'}
     <!-- // @TODO - send values to create-prism method -->
-    <Slide direction={slideDirection}
-      ><Button format="secondary" on:click={() => back()}>Back</Button>Finish</Slide
-    >
+    <Slide direction={slideDirection}>
+      <div class="flex gap-2 w-full items-end justify-center">
+        <Button format="secondary" on:click={() => finish({ label, members })}>Finish</Button>
+      </div>
+    </Slide>
   {/if}
 </div>
 
