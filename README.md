@@ -2,11 +2,21 @@
 
 ![Prism Preview](https://i.imgur.com/heUckq4.jpg)
 
+## Introduction:
 ROYGBIV creates Lightning prisms, which are BOLT 12 offers that split Lightning payments to different parties at percentages you define.
 
 This repository contains a progressive web app - the frontend component to ROYGBIV. The backend Core Lightning plugin is available [here](https://github.com/daGoodenough/ROYGBIV-backend) and requires Core Lightning with the runtime flag 'experimental-dual-fund.' 
 
-BOLT 12 offers are static QR payment codes that can be reused again and again. Currently, ROYGBIV supports prism payouts to node pubkeys via keysend. Support for split payments to other BOLT 12 offers, LNURL, AMP, and Lightning Addresses are coming soon. 
+BOLT 12 offers are static QR payment codes that can be reused again and again. Currently, ROYGBIV supports prism payouts to node pubkeys via keysend.
+
+## Challenges:
+- Core Lightning plugin local development environment.
+- Started on Polar but ultimately had to move to Docker.
+
+## Coming Soon:
+- Add functionality to edit existings prisms: add or remove members, change share amounts, etc.
+- Add support for split payments to other BOLT 12 offers, LNURL, AMP, and Lightning Addresses. 
+- Add different payout strategies, such as payment amount thresholds and time-based payouts.
 
 ## Install Instructions:
 
