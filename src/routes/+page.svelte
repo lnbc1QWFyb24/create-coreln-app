@@ -1,6 +1,6 @@
 <script lang="ts">
   import Lnmessage from 'lnmessage'
-  import { parseNodeAddress } from './utils.js'
+  import { parseNodeAddress } from '../utils.js'
   import Header from '../components/Header.svelte'
   import type { Info, Prism } from '../types.js'
 
