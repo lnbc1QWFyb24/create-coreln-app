@@ -16,11 +16,9 @@
     }
   }
 
-  let address = '03093b030028e642fc3b9a05c8eb549f202958e92143da2e85579b92ef0f49cc7d@localhost:7272'
-  let rune = '7OQKm3FL-zIftx1z29E7KFGyVOgAY54ZyeWRtx8e2Q09MQ=='
-  let method: string
-  let params: string
-  let result: string
+  let address = ''
+  let rune = ''
+  let bolt12 = ''
 
   let modalOpen = false
   let connecting = false
@@ -53,23 +51,38 @@
     connecting = false
   }
 
-  async function request() {
-    let parsedParams: unknown | undefined
-
+  async function request(method: string, params: unknown): Promise<unknown> {
     try {
-      parsedParams = params ? JSON.parse(params) : undefined
-
-      const requestResult = await ln.commando({
+      const result = await ln.commando({
         method,
-        params: parsedParams,
+        params,
         rune
       })
 
-      result = JSON.stringify(requestResult, null, 2)
+      return result
     } catch (error) {
       const { message } = error as { message: string }
-      alert(message)
-      return
+      console.log(message)
+    }
+  }
+
+  type Member = {
+    name: string
+    destination: string
+    split: number
+  }
+
+  type Prism = {
+    label: string
+    members: Member[]
+  }
+
+  async function createPrism(prism: Prism) {
+    try {
+      const result = await request('createprism', prism)
+      bolt12 = (result as { bolt12: string }).bolt12
+    } catch (error) {
+      console.log(error)
     }
   }
 </script>
@@ -87,8 +100,9 @@
   <!-- Button to open connect modal -->
   {#if $connectionStatus$ !== 'connected' && !modalOpen}
     <div class="">
-      Test
-      <button on:click={() => (modalOpen = !modalOpen)}>OPEN MODAL</button>
+      <button class="px-4 py-2 border rounded" on:click={() => (modalOpen = !modalOpen)}
+        >Connect</button
+      >
     </div>
   {/if}
   <!-- Modal -->
