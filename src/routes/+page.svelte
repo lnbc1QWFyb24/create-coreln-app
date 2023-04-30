@@ -2,6 +2,7 @@
   import Lnmessage from 'lnmessage'
   import { parseNodeAddress } from '../utils.js'
   import Header from '../components/Header.svelte'
+  import Steps from '../components/Steps.svelte'
   import Slide from '../components/Slide.svelte'
   import type { Info, Prism } from '../types.js'
   import { fade } from 'svelte/transition'
@@ -10,7 +11,6 @@
   import Button from '../components/Button.svelte'
   import Icon from '../components/Icon/Icon.svelte'
 
-
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
 
@@ -18,35 +18,19 @@
     connectionStatus$ = ln.connectionStatus$
   }
 
-  let address = '0314eaa0f87f844933fe6af76930b9ff3ef09c8ec7f226243d3c56dfecd758cf88@localhost:7272'
-  let rune = 'koyEoWA-Zeof6fxJXpZPpGbJAhyFU1yTErX1UBTQZyI9MQ=='
+  $: {
+    if ($connectionStatus$ === 'connected') {
+      modalOpen = null
+    }
+  }
+
+  let address = ''
+  let rune = ''
   let bolt12 = ''
   let info: Info
 
   let modalOpen: 'connect' | 'qr' | null = null
   let connecting = false
-
-  type Slides = typeof slides
-  type SlideStep = Slides[number]
-  type SlideDirection = 'right' | 'left'
-
-  const slides = ['0', '1', '2', 'summary'] as const
-  let slide: SlideStep = '0'
-  let previousSlide: SlideStep = '0'
-
-  $: slideDirection = (
-    slides.indexOf(previousSlide) > slides.indexOf(slide) ? 'right' : 'left'
-  ) as SlideDirection
-
-  function back() {
-    previousSlide = slides[slides.indexOf(slide) - 2]
-    slide = slides[slides.indexOf(slide) - 1]
-  }
-
-  function next(to = slides[slides.indexOf(slide) + 1]) {
-    previousSlide = slide
-    slide = to
-  }
 
   async function connect() {
     const { publicKey, ip, port } = parseNodeAddress(address)
@@ -119,18 +103,19 @@
   <!-- Button to open connect modal -->
   {#if $connectionStatus$ !== 'connected' && !modalOpen}
     <div class="">
-      <Button on:click={() => (modalOpen = !modalOpen)} icon="ArrowUpCircle">
-        Connect
-      </Button>
+      <Button on:click={() => (modalOpen = 'connect')} icon="ArrowUpCircle">Connect</Button>
     </div>
   {/if}
   <!-- Modal -->
-  {#if modalOpen}
+  {#if modalOpen === 'connect'}
     <div
       class="w-full h-full top-0 backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
     >
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div class="p-4 cursor-pointer absolute top-4 right-4 text-white" on:click={() => (modalOpen = false)}>
+      <div
+        class="p-4 cursor-pointer absolute top-4 right-4 text-white"
+        on:click={() => (modalOpen = null)}
+      >
         <div class="w-6 h-6">
           <Icon icon="Cross" />
         </div>
@@ -161,11 +146,8 @@
         </div>
         <!-- Connect Button -->
         <div class="flex items-center justify-between w-full mt-4">
-          <Button
-            on:click={connect}
-            disabled={!address}
-            >
-              {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
+          <Button on:click={connect} disabled={!address}>
+            {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
           </Button>
         </div>
       </div>
@@ -174,27 +156,7 @@
 
   <!-- Prism Steps -->
   {#if $connectionStatus$ === 'connected'}
-    <div class="border max-w-lg w-full p-10">
-      {#if slide === '0'}
-        <Slide direction={slideDirection}>
-          <h2>Create Prism</h2>
-          <p>Let's create your prism. All you need is a name and a way to identify the members of your split on the lightning network.</p>
-          <button class="border p-2" on:click={() => next()}>Next</button>
-        </Slide>
-      {/if}
-      {#if slide === '1'}
-        <Slide direction={slideDirection}>
-          <button class="border p-2" on:click={() => back()}>Back</button>
-          Add Members
-          <button class="border p-2" on:click={() => next()}>Next</button>
-        </Slide>
-      {/if}
-      {#if slide === '2'}
-        <Slide direction={slideDirection}
-          ><button class="border p-2" on:click={() => back()}>Back</button>Finish</Slide
-        >
-      {/if}
-    </div>
+    <Steps />
   {/if}
 </main>
 
