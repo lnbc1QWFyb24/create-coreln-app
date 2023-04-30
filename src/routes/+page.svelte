@@ -2,7 +2,10 @@
   import Lnmessage from 'lnmessage'
   import { parseNodeAddress } from '../utils.js'
   import Header from '../components/Header.svelte'
+  import Slide from '../components/Slide.svelte'
+  import { goto } from '$app/navigation'
   import type { Info, Prism } from '../types.js'
+
 
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
@@ -26,6 +29,28 @@
 
   let modalOpen = false
   let connecting = false
+
+  type Slides = typeof slides
+  type SlideStep = Slides[number]
+  type SlideDirection = 'right' | 'left'
+
+  const slides = ['0', '1', '2', 'summary'] as const
+  let slide: SlideStep = '0'
+  let previousSlide: SlideStep = '0'
+
+  $: slideDirection = (
+    slides.indexOf(previousSlide) > slides.indexOf(slide) ? 'right' : 'left'
+  ) as SlideDirection
+
+  function back() {
+    previousSlide = slides[slides.indexOf(slide) - 2]
+    slide = slides[slides.indexOf(slide) - 1]
+  }
+
+  function next(to = slides[slides.indexOf(slide) + 1]) {
+    previousSlide = slide
+    slide = to
+  }
 
   async function connect() {
     const { publicKey, ip, port } = parseNodeAddress(address)
@@ -92,7 +117,7 @@
   />
 </svelte:head>
 <main class="w-screen h-screen flex flex-col items-center justify-center relative">
-  <Header {info} />
+<Header {info} />
 
   <!-- Button to open connect modal -->
   {#if $connectionStatus$ !== 'connected' && !modalOpen}
@@ -160,4 +185,25 @@
       </div>
     </div>
   {/if}
+  <!-- Prism Steps -->
+  <div class="border max-w-lg w-full p-10">
+    {#if slide === '0'}
+      <Slide direction={slideDirection}>
+        Create Prisom
+        <button class="border p-2" on:click={() => next()}>Next</button>
+      </Slide>
+    {/if}
+    {#if slide === '1'}
+      <Slide direction={slideDirection}>
+        <button class="border p-2" on:click={() => back()}>Back</button>
+        Add Members
+        <button class="border p-2" on:click={() => next()}>Next</button>
+      </Slide>
+    {/if}
+    {#if slide === '2'}
+      <Slide direction={slideDirection}
+        ><button class="border p-2" on:click={() => back()}>Back</button>Finish</Slide
+      >
+    {/if}
+  </div>
 </main>
