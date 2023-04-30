@@ -105,51 +105,7 @@
       <Button on:click={() => (modalOpen = 'connect')} icon="ArrowUpCircle">Connect</Button>
     </div>
   {/if}
-  <!-- Modal -->
-  {#if modalOpen === 'connect'}
-    <div
-      class="w-full h-full top-0 backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
-    >
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div
-        class="p-4 cursor-pointer absolute top-4 right-4 text-white w-6 h-6"
-        on:click={() => (modalOpen = null)}
-      >
-        <Icon icon="Cross" /> X
-      </div>
-      <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
-        <h1 class="text-lg">Connect your Node</h1>
-        <!-- Address -->
-        <div class="mt-4 w-full text-sm">
-          <label class="font-medium mb-1 block" for="address">Address</label>
-          <textarea
-            id="address"
-            class="border w-full p-2 rounded"
-            rows="3"
-            bind:value={address}
-            placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
-          />
-        </div>
-        <!-- Rune -->
-        <div class="w-full mt-4 text-sm">
-          <label class="font-medium mb-1 block" for="rune">Rune</label>
-          <textarea
-            id="rune"
-            class="border w-full p-2 rounded"
-            rows="2"
-            bind:value={rune}
-            placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
-          />
-        </div>
-        <!-- Connect Button -->
-        <div class="flex items-center justify-between w-full mt-4">
-          <Button on:click={connect} disabled={!address}>
-            {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
-          </Button>
-        </div>
-      </div>
-    </div>
-  {/if}
+  
 
   <!-- Prism Steps -->
   {#if $connectionStatus$ === 'connected'}
@@ -157,63 +113,53 @@
   {/if}
 </main>
 
-<!-- MODALS -->
+<!-- Modal -->
 {#if modalOpen === 'connect'}
+<div
+transition:fade
+  class="w-full h-full absolute top-0 bg-black/30 flex flex-col items-center justify-center z-10"
+>
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div
-    transition:fade
-    class="w-full h-full top-0 absolute backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
+    class="p-4 cursor-pointer absolute top-4 right-4 text-white"
+    on:click={() => (modalOpen = null)}
   >
-    <button class="w-8 cursor-pointer absolute top-4 right-4" on:click={() => (modalOpen = null)}>
-      {@html close}
-    </button>
-    <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
-      <h1 class="text-lg">Connect your Node</h1>
-      <!-- Address -->
-      <div class="mt-4 w-full text-sm">
-        <label class="font-medium mb-1 block" for="address">Address</label>
-        <textarea
-          id="address"
-          class="border w-full p-2 rounded"
-          rows="3"
-          bind:value={address}
-          placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
-        />
-      </div>
-      <!-- Rune -->
-      <div class="w-full mt-4 text-sm">
-        <label class="font-medium mb-1 block" for="rune">Rune</label>
-        <textarea
-          id="rune"
-          class="border w-full p-2 rounded"
-          rows="2"
-          bind:value={rune}
-          placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
-        />
-      </div>
-      <!-- Connect Button -->
-      <div class="flex items-center justify-between w-full mt-4">
-        <button
-          on:click={connect}
-          disabled={!address}
-          class="border border-purple-500 rounded py-1 px-4 disabled:opacity-20 hover:shadow-md active:shadow-none"
-          >{$connectionStatus$ === 'connecting' ? '...' : 'Connect'}</button
-        >
-
-        {#if connectionStatus$}
-          <div class="flex items-center">
-            <div class="text-sm">{$connectionStatus$}</div>
-            <div
-              class:bg-green-500={$connectionStatus$ === 'connected'}
-              class:bg-yellow-500={$connectionStatus$ === 'connecting' ||
-                $connectionStatus$ === 'waiting_reconnect'}
-              class:bg-red-500={$connectionStatus$ === 'disconnected'}
-              class="w-3 h-3 rounded-full ml-1 transition-colors"
-            />
-          </div>
-        {/if}
-      </div>
+    <div class="w-6 h-6">
+      <Icon icon="Cross" />
     </div>
   </div>
+  <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
+    <h1 class="text-lg">Connect your Node</h1>
+    <!-- Address -->
+    <div class="mt-4 w-full text-sm">
+      <label class="font-medium mb-1 block" for="address">Address</label>
+      <textarea
+        id="address"
+        class="border w-full p-2 rounded"
+        rows="3"
+        bind:value={address}
+        placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
+      />
+    </div>
+    <!-- Rune -->
+    <div class="w-full mt-4 text-sm">
+      <label class="font-medium mb-1 block" for="rune">Rune</label>
+      <textarea
+        id="rune"
+        class="border w-full p-2 rounded"
+        rows="2"
+        bind:value={rune}
+        placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
+      />
+    </div>
+    <!-- Connect Button -->
+    <div class="flex items-center justify-between w-full mt-4">
+      <Button on:click={connect} disabled={!address}>
+        {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
+      </Button>
+    </div>
+  </div>
+</div>
 {/if}
 
 {#if modalOpen === 'qr'}
@@ -228,3 +174,9 @@
     <Qr value={bolt12} />
   </div>
 {/if}
+
+<style>
+  h2 {
+    @apply font-bold text-lg;
+  }
+</style>
