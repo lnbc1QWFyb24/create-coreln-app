@@ -3,7 +3,6 @@
   import { parseNodeAddress } from '../utils.js'
   import Header from '../components/Header.svelte'
   import Steps from '../components/Steps.svelte'
-  import Slide from '../components/Slide.svelte'
   import type { Info, Prism } from '../types.js'
   import { fade } from 'svelte/transition'
   import Qr from '../components/QR.svelte'
@@ -24,8 +23,8 @@
     }
   }
 
-  let address = '0314eaa0f87f844933fe6af76930b9ff3ef09c8ec7f226243d3c56dfecd758cf88@localhost:7272'
-  let rune = 'koyEoWA-Zeof6fxJXpZPpGbJAhyFU1yTErX1UBTQZyI9MQ=='
+  let address = '03093b030028e642fc3b9a05c8eb549f202958e92143da2e85579b92ef0f49cc7d@localhost:7272'
+  let rune = 'giUCzh3OxUUE98muxeLdaiH0nbnQWa0hbw9-zrMNp5M9NA=='
   let bolt12 = ''
   let info: Info
 
