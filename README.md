@@ -1,26 +1,20 @@
-# Create CoreLN App
+# ROYGBIV
 
-This is a simple boilerplate repo that can be a good starting point for building a web app that connects directly to CoreLN nodes via the encrypted Lightning Network messaging protocol. It uses [Lnmessage](https://github.com/aaronbarnardsound/lnmessage) to establish a websocket connection via a direct connection if a [WS port is exposed](https://docs.corelightning.org/reference/lightningd-config#experimental-options) on the node. Alternatively it can be modified to connect via a trustless WS -> TCP proxy for production deploys.
+![Prism Preview](https://i.imgur.com/heUckq4.jpg)
 
-The frontend tech stack uses [Sveltekit](https://kit.svelte.dev), a web framework built around [Svelte](https://svelte.dev) that can be configured as a [Single Page](https://kit.svelte.dev/docs/glossary#spa) or [Server Side Rendered](https://kit.svelte.dev/docs/glossary#ssr) app or anywhere in between.
+ROYGBIV creates Lightning prisms, which are split Lightning payments to different parties at percentages you define.
 
-TypeScript is configured to enforce types.
+This repository contains a progressive web app - the frontend compontent to ROYGBIV. The backend Core Lightning plugin is available [here](https://github.com/daGoodenough/ROYGBIV-backend) and requires Core Lightning with the runtime flag 'experimental-dual-fund.' 
 
-I have added a [service worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) with just the basic Svelte recommended offline caching setup as well as a manifest file to make it a [Progressive Web App](https://web.dev/progressive-web-apps/).
+ROYGBIV prisms are a BOLT 12 offers, which are static QR codes that can be reused again and again. The output of a prism splits payments to other BOLT 12 offers, Lightning Addresses, or node pubkeys via keysend. 
 
-For styling [Tailwind CSS](https://tailwindcss.com/) has been added which makes styling and theming pretty easy.
+## Install Instructions:
 
-[Playwright](https://playwright.dev/) and [Vite test](https://vitest.dev/) have been setup for testing.
-
-Linting and code formatting are setup with [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/) and can be modified as needed.
-
-## Get started
-
-1. Clone (or Fork) the repo
+1. Clone (or fork) ROYGBIV:
 
 ```bash
-git clone https://github.com/aaronbarnardsound/create-coreln-app.git
-cd create-core-ln-app
+git clone https://github.com/johngribbin/ROYGBIV-frontend.git
+cd ROYGBIV-frontend
 ```
 
 2. Install the dependencies
@@ -35,4 +29,6 @@ npm i
 npm run dev
 ```
 
-4. Open up [http://localhost:5173](http://localhost:5371) in your browser
+4. Open up [http://localhost:5173](http://localhost:5173) in your browser
+
+5. Follow the instructions at [https://github.com/daGoodenough/ROYGBIV-backend](https://github.com/daGoodenough/ROYGBIV-backend) to set up the backend. 
