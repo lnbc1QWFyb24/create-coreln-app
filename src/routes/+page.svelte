@@ -81,8 +81,11 @@
 
   async function createPrism(prism: Prism) {
     try {
-      const result = await request('createprism', prism)
-      bolt12 = (result as { bolt12: string }).bolt12
+      const result =
+        'lno1qgsqvgnwgcg35z6ee2h3yczraddm72xrfua9uve2rlrm9deu7xyfzrc2q32xjurnzgpyzsskyyppzvu7dwwmpelpf5vme4sj6p46ymme86xsf847n2v689nxdr6ds8c'
+      bolt12 = result
+      // const result = await request('createprism', prism)
+      // bolt12 = (result as { bolt12: string }).bolt12
     } catch (error) {
       console.log(error)
     }
