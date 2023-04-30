@@ -29,7 +29,7 @@
       <BackButton on:click={back} />
     {/if}
 
-    <div in:fly|local={{ x, duration: 250 }} class="flex justify-center h-full overflow-auto">
+    <div in:fly|local={{ x, duration: 250 }} class="flex flex-col gap-4 justify-center h-full overflow-auto">
       <slot />
     </div>
   </div>
