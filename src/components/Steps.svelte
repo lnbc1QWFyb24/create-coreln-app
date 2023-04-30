@@ -8,7 +8,7 @@
   type SlideStep = Slides[number]
   type SlideDirection = 'right' | 'left'
 
-  const slides = ['0', '1', '2', 'summary'] as const
+  const slides = ['0', '1'] as const
   let slide: SlideStep = '0'
   let previousSlide: SlideStep = '0'
 
@@ -123,17 +123,12 @@
       </div>
       <div class="flex gap-2 w-full items-end justify-end">
         <Button format="secondary" on:click={() => back()}>Back</Button>
-        <Button icon="ArrowRight" on:click={() => next()}>Next</Button>
+        <div class="flex gap-2 w-full items-end justify-end">
+          <Button format="secondary" on:click={() => finish({ label, members })}>Finish</Button>
+        </div>
       </div>
     </Slide>
-  {/if}
-  {#if slide === '2'}
-    <!-- // @TODO - send values to create-prism method -->
-    <Slide direction={slideDirection}>
-      <div class="flex gap-2 w-full items-end justify-center">
-        <Button format="secondary" on:click={() => finish({ label, members })}>Finish</Button>
-      </div>
-    </Slide>
+    <!-- TODO add slider for SUMMARY -->
   {/if}
 </div>
 
