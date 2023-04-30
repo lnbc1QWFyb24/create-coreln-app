@@ -10,6 +10,7 @@
   import Button from '../components/Button.svelte'
   import Icon from '../components/Icon/Icon.svelte'
   import prism from '../icons/prism.js'
+  import Triangle from '../components/Triangle.svelte'
 
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
@@ -107,9 +108,7 @@
 
   {#if !info}
     <div class="mb-8 flex justify-center">
-      <video src="triangle.mp4" poster="triangle.jpg" autoplay loop class="w-2/3">
-        ROYGBIV
-      </video>
+      <video src="triangle.mp4" poster="triangle.jpg" autoplay loop class="w-2/3"> ROYGBIV </video>
     </div>
   {/if}
 
@@ -132,7 +131,7 @@
   {/if}
 </main>
 
-<!-- Modal -->
+<!-- Connect Modal -->
 {#if modalOpen === 'connect'}
   <div
     transition:fade
@@ -181,16 +180,23 @@
   </div>
 {/if}
 
+<!-- QR Modal -->
 {#if modalOpen === 'qr'}
   <div
     transition:fade
-    class="w-full h-full top-0 absolute backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
+    class="flex w-full h-full top-0 absolute backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
   >
-    <button class="w-8 cursor-pointer absolute top-4 right-4" on:click={() => (modalOpen = null)}>
+    <button
+      class="w-8 cursor-pointer absolute top-4 right-4 z-[99]"
+      on:click={() => (modalOpen = null)}
+    >
       {@html close}
     </button>
 
-    <Qr value={bolt12} />
+    <Triangle />
+    <div class="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center">
+      <Qr value={bolt12} />
+    </div>
   </div>
 {/if}
 
