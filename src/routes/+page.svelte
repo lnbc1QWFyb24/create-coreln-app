@@ -18,8 +18,8 @@
     connectionStatus$ = ln.connectionStatus$
   }
 
-  let address = ''
-  let rune = ''
+  let address = '0314eaa0f87f844933fe6af76930b9ff3ef09c8ec7f226243d3c56dfecd758cf88@localhost:7272'
+  let rune = 'koyEoWA-Zeof6fxJXpZPpGbJAhyFU1yTErX1UBTQZyI9MQ=='
   let bolt12 = ''
   let info: Info
 
@@ -177,7 +177,8 @@
     <div class="border max-w-lg w-full p-10">
       {#if slide === '0'}
         <Slide direction={slideDirection}>
-          Create Prisom
+          <h2>Create Prism</h2>
+          <p>Let's create your prism. All you need is a name and a way to identify the members of your split on the lightning network.</p>
           <button class="border p-2" on:click={() => next()}>Next</button>
         </Slide>
       {/if}
@@ -268,3 +269,9 @@
     <Qr value={bolt12} />
   </div>
 {/if}
+
+<style>
+  h2 {
+    @apply font-bold text-lg;
+  }
+</style>
