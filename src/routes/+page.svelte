@@ -1,6 +1,7 @@
 <script lang="ts">
   import Lnmessage from 'lnmessage'
   import { parseNodeAddress } from './utils.js'
+  import Header from '../components/Header.svelte';
 
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
@@ -86,19 +87,16 @@
   }
 </script>
 
+<svelte:head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</svelte:head>
 <main class="w-screen h-screen flex flex-col items-center justify-center relative">
-  <header class="absolute top-0 flex justify-between p-6 w-full items-center">
-    <h1 class="font-bold text-3xl">ROYGBIV</h1>
-    {#if ln}
-      <!-- <div class="text-sm">
-        Browser Id: {`${ln.publicKey.slice(0, 8)}...${ln.publicKey.slice(-8)}`}
-      </div> -->
-      <p>
-        @TODO - Add button to add a prisim - Add list of members in the prism (name, split) - list
-        of members in the container
-      </p>
-    {/if}
-  </header>
+  
+  <Header text="wooooo" ln={ln} />
+
+  
   <!-- Button to open connect modal -->
   {#if $connectionStatus$ !== 'connected' && !modalOpen}
     <div class="">
