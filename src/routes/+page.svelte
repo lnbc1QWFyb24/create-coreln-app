@@ -24,8 +24,8 @@
     }
   }
 
-  let address = '03093b030028e642fc3b9a05c8eb549f202958e92143da2e85579b92ef0f49cc7d@localhost:7272'
-  let rune = 'giUCzh3OxUUE98muxeLdaiH0nbnQWa0hbw9-zrMNp5M9NA=='
+  let address = '0314eaa0f87f844933fe6af76930b9ff3ef09c8ec7f226243d3c56dfecd758cf88@localhost:7272'
+  let rune = 'koyEoWA-Zeof6fxJXpZPpGbJAhyFU1yTErX1UBTQZyI9MQ=='
   let bolt12 = ''
   let info: Info
 
@@ -108,7 +108,7 @@
 
   <!-- Button to open connect modal -->
   {#if $connectionStatus$ !== 'connected' && !modalOpen}
-    <div class="flex flex-col items-center justify-center">
+    <div class="flex flex-col items-center justify-center bg-black">
       <Button on:click={() => (modalOpen = 'connect')} icon="ArrowUpCircle">Connect</Button>
 
       <p class="max-w-md mt-8 text-center">
@@ -140,7 +140,7 @@
         <Icon icon="Cross" />
       </div>
     </div>
-    <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
+    <div class="w-1/2 max-w-lg border-2 p-6 rounded relative bg-black">
       <h1 class="text-lg">Connect your Node</h1>
       <!-- Address -->
       <div class="mt-4 w-full text-sm">
