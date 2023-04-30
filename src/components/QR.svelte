@@ -1,11 +1,12 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
   import { onDestroy } from 'svelte'
-  import QRCodeStyling from 'qr-code-styling'
   import copy from '../icons/copy'
   import photo from '../icons/photo'
   import check from '../icons/check'
   import { truncateValue } from '../utils'
+  import { browser } from '$app/environment'
+  import type QRCodeStyling from 'qr-code-styling'
 
   export let value: string | null
   export let size = Math.min(window.innerWidth - 50, 400)
@@ -19,32 +20,36 @@
   let canvas: HTMLCanvasElement | null = null
   let node: HTMLDivElement
   let qrCode: QRCodeStyling
+  let rendered = false
 
-  $: if (value && node) {
-    qrCode = new QRCodeStyling({
-      width: size,
-      height: size,
-      type: 'svg',
-      data: `lightning:${value}`.toUpperCase(),
-      imageOptions: { hideBackgroundDots: false, imageSize: 0.25, margin: 0 },
-      dotsOptions: {
-        type: 'dots',
-        color: '#ef4444',
-        gradient: {
-          type: 'radial',
-          rotation: 0.017453292519943295,
-          colorStops: [
-            { offset: 0, color: '#22c55e' },
-            { offset: 1, color: '#8b5cf6' }
-          ]
-        }
-      },
-      backgroundOptions: { color: '#ffffff' },
-      cornersSquareOptions: { type: 'extra-rounded', color: '#f97316' },
-      cornersDotOptions: { type: 'dot', color: '#000000' }
+  $: if (browser && value && node && !rendered) {
+    import('qr-code-styling').then(({ default: QRCodeStyling }) => {
+      qrCode = new QRCodeStyling({
+        width: size,
+        height: size,
+        type: 'svg',
+        data: `lightning:${value}`.toUpperCase(),
+        imageOptions: { hideBackgroundDots: false, imageSize: 0.25, margin: 0 },
+        dotsOptions: {
+          type: 'dots',
+          color: '#ec4899',
+          gradient: {
+            type: 'radial',
+            rotation: 0.017453292519943295,
+            colorStops: [
+              { offset: 0, color: '#f97316' },
+              { offset: 1, color: '#d946ef' }
+            ]
+          }
+        },
+        backgroundOptions: { color: '#ffffff' },
+        cornersSquareOptions: { type: 'extra-rounded', color: '#22c55e' },
+        cornersDotOptions: { type: 'dot', color: '#000000' }
+      })
+
+      qrCode.append(node)
+      rendered = true
     })
-
-    qrCode.append(node)
   }
 
   let copySuccess = false

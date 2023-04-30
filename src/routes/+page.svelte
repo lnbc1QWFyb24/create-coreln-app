@@ -2,9 +2,14 @@
   import Lnmessage from 'lnmessage'
   import { parseNodeAddress } from '../utils.js'
   import Header from '../components/Header.svelte'
+  import Steps from '../components/Steps.svelte'
+  import Slide from '../components/Slide.svelte'
   import type { Info, Prism } from '../types.js'
   import { fade } from 'svelte/transition'
-  import Steps from '../components/Steps.svelte'
+  import Qr from '../components/QR.svelte'
+  import close from '../icons/close.js'
+  import Button from '../components/Button.svelte'
+  import Icon from '../components/Icon/Icon.svelte'
 
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
@@ -19,10 +24,8 @@
     }
   }
 
-  // let address = ''
-  // let rune = ''
-  let address = '03093b030028e642fc3b9a05c8eb549f202958e92143da2e85579b92ef0f49cc7d@localhost:7272'
-  let rune = 'ezpOqCBcoWT4HYOAZl84i3a5HiI08fuXPiY93U15DnE9Mw=='
+  let address = ''
+  let rune = ''
   let bolt12 = ''
   let info: Info
 
@@ -55,6 +58,7 @@
     connecting = true
     await ln.connect()
     connecting = false
+    modalOpen = null
 
     const infoResult = await request('getinfo')
     info = infoResult as Info
@@ -99,9 +103,54 @@
   <!-- Button to open connect modal -->
   {#if $connectionStatus$ !== 'connected' && !modalOpen}
     <div class="">
-      <button class="px-4 py-2 border rounded" on:click={() => (modalOpen = 'connect')}
-        >Connect</button
-      >
+      <Button on:click={() => (modalOpen = !modalOpen)} icon="ArrowUpCircle">
+        Connect
+      </Button>
+    </div>
+  {/if}
+  <!-- Modal -->
+  {#if modalOpen}
+    <div
+      class="w-full h-full top-0 backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
+    >
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div class="p-4 cursor-pointer absolute top-4 right-4 text-white w-6 h-6" on:click={() => (modalOpen = false)}>
+        <Icon icon="Cross" /> X
+      </div>
+      <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
+        <h1 class="text-lg">Connect your Node</h1>
+        <!-- Address -->
+        <div class="mt-4 w-full text-sm">
+          <label class="font-medium mb-1 block" for="address">Address</label>
+          <textarea
+            id="address"
+            class="border w-full p-2 rounded"
+            rows="3"
+            bind:value={address}
+            placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
+          />
+        </div>
+        <!-- Rune -->
+        <div class="w-full mt-4 text-sm">
+          <label class="font-medium mb-1 block" for="rune">Rune</label>
+          <textarea
+            id="rune"
+            class="border w-full p-2 rounded"
+            rows="2"
+            bind:value={rune}
+            placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
+          />
+        </div>
+        <!-- Connect Button -->
+        <div class="flex items-center justify-between w-full mt-4">
+          <Button
+            on:click={connect}
+            disabled={!address}
+            >
+              {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
+          </Button>
+        </div>
+      </div>
     </div>
   {/if}
 
@@ -117,9 +166,8 @@
     transition:fade
     class="w-full h-full top-0 absolute backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
   >
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <button class="p-4 cursor-pointer absolute top-4 right-4" on:click={() => (modalOpen = null)}>
-      X
+    <button class="w-8 cursor-pointer absolute top-4 right-4" on:click={() => (modalOpen = null)}>
+      {@html close}
     </button>
     <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
       <h1 class="text-lg">Connect your Node</h1>
@@ -168,5 +216,18 @@
         {/if}
       </div>
     </div>
+  </div>
+{/if}
+
+{#if modalOpen === 'qr'}
+  <div
+    transition:fade
+    class="w-full h-full top-0 absolute backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
+  >
+    <button class="w-8 cursor-pointer absolute top-4 right-4" on:click={() => (modalOpen = null)}>
+      {@html close}
+    </button>
+
+    <Qr value={bolt12} />
   </div>
 {/if}
