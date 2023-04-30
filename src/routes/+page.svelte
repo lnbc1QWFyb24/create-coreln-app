@@ -64,6 +64,26 @@
       console.log(message)
     }
   }
+
+  type Member = {
+    name: string
+    destination: string
+    split: number
+  }
+
+  type Prism = {
+    label: string
+    members: Member[]
+  }
+
+  async function createPrism(prism: Prism) {
+    try {
+      const result = await request('createprism', prism)
+      bolt12 = (result as { bolt12: string }).bolt12
+    } catch (error) {
+      console.log(error)
+    }
+  }
 </script>
 
 <main class="w-screen h-screen flex flex-col items-center justify-center relative">
