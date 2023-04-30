@@ -5,7 +5,7 @@
   import Slide from '../components/Slide.svelte'
   import { goto } from '$app/navigation'
   import type { Info, Prism } from '../types.js'
-
+  import { fade } from 'svelte/transition'
 
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
@@ -16,7 +16,7 @@
 
   $: {
     if ($connectionStatus$ === 'connected') {
-      modalOpen = false
+      modalOpen = null
     }
   }
 
@@ -27,7 +27,7 @@
   let bolt12 = ''
   let info: Info
 
-  let modalOpen = false
+  let modalOpen: 'connect' | 'qr' | null = null
   let connecting = false
 
   type Slides = typeof slides
@@ -117,93 +117,98 @@
   />
 </svelte:head>
 <main class="w-screen h-screen flex flex-col items-center justify-center relative">
-<Header {info} />
+  <Header {info} />
 
   <!-- Button to open connect modal -->
   {#if $connectionStatus$ !== 'connected' && !modalOpen}
     <div class="">
-      <button class="px-4 py-2 border rounded" on:click={() => (modalOpen = !modalOpen)}
+      <button class="px-4 py-2 border rounded" on:click={() => (modalOpen = 'connect')}
         >Connect</button
       >
     </div>
   {/if}
-  <!-- Modal -->
-  {#if modalOpen}
-    <div
-      class="w-full h-full top-0 backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
-    >
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div class="p-4 cursor-pointer absolute top-4 right-4" on:click={() => (modalOpen = false)}>
-        X
-      </div>
-      <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
-        <h1 class="text-lg">Connect your Node</h1>
-        <!-- Address -->
-        <div class="mt-4 w-full text-sm">
-          <label class="font-medium mb-1 block" for="address">Address</label>
-          <textarea
-            id="address"
-            class="border w-full p-2 rounded"
-            rows="3"
-            bind:value={address}
-            placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
-          />
-        </div>
-        <!-- Rune -->
-        <div class="w-full mt-4 text-sm">
-          <label class="font-medium mb-1 block" for="rune">Rune</label>
-          <textarea
-            id="rune"
-            class="border w-full p-2 rounded"
-            rows="2"
-            bind:value={rune}
-            placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
-          />
-        </div>
-        <!-- Connect Button -->
-        <div class="flex items-center justify-between w-full mt-4">
-          <button
-            on:click={connect}
-            disabled={!address}
-            class="border border-purple-500 rounded py-1 px-4 disabled:opacity-20 hover:shadow-md active:shadow-none"
-            >{$connectionStatus$ === 'connecting' ? '...' : 'Connect'}</button
-          >
 
-          {#if connectionStatus$}
-            <div class="flex items-center">
-              <div class="text-sm">{$connectionStatus$}</div>
-              <div
-                class:bg-green-500={$connectionStatus$ === 'connected'}
-                class:bg-yellow-500={$connectionStatus$ === 'connecting' ||
-                  $connectionStatus$ === 'waiting_reconnect'}
-                class:bg-red-500={$connectionStatus$ === 'disconnected'}
-                class="w-3 h-3 rounded-full ml-1 transition-colors"
-              />
-            </div>
-          {/if}
-        </div>
-      </div>
+  <!-- Prism Steps -->
+  {#if $connectionStatus$ === 'connected'}
+    <div class="border max-w-lg w-full p-10">
+      {#if slide === '0'}
+        <Slide direction={slideDirection}>
+          Create Prisom
+          <button class="border p-2" on:click={() => next()}>Next</button>
+        </Slide>
+      {/if}
+      {#if slide === '1'}
+        <Slide direction={slideDirection}>
+          <button class="border p-2" on:click={() => back()}>Back</button>
+          Add Members
+          <button class="border p-2" on:click={() => next()}>Next</button>
+        </Slide>
+      {/if}
+      {#if slide === '2'}
+        <Slide direction={slideDirection}
+          ><button class="border p-2" on:click={() => back()}>Back</button>Finish</Slide
+        >
+      {/if}
     </div>
   {/if}
-  <!-- Prism Steps -->
-  <div class="border max-w-lg w-full p-10">
-    {#if slide === '0'}
-      <Slide direction={slideDirection}>
-        Create Prisom
-        <button class="border p-2" on:click={() => next()}>Next</button>
-      </Slide>
-    {/if}
-    {#if slide === '1'}
-      <Slide direction={slideDirection}>
-        <button class="border p-2" on:click={() => back()}>Back</button>
-        Add Members
-        <button class="border p-2" on:click={() => next()}>Next</button>
-      </Slide>
-    {/if}
-    {#if slide === '2'}
-      <Slide direction={slideDirection}
-        ><button class="border p-2" on:click={() => back()}>Back</button>Finish</Slide
-      >
-    {/if}
-  </div>
 </main>
+
+<!-- MODALS -->
+{#if modalOpen === 'connect'}
+  <div
+    transition:fade
+    class="w-full h-full top-0 absolute backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
+  >
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <button class="p-4 cursor-pointer absolute top-4 right-4" on:click={() => (modalOpen = null)}>
+      X
+    </button>
+    <div class="w-1/2 max-w-lg border-2 p-6 rounded relative">
+      <h1 class="text-lg">Connect your Node</h1>
+      <!-- Address -->
+      <div class="mt-4 w-full text-sm">
+        <label class="font-medium mb-1 block" for="address">Address</label>
+        <textarea
+          id="address"
+          class="border w-full p-2 rounded"
+          rows="3"
+          bind:value={address}
+          placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
+        />
+      </div>
+      <!-- Rune -->
+      <div class="w-full mt-4 text-sm">
+        <label class="font-medium mb-1 block" for="rune">Rune</label>
+        <textarea
+          id="rune"
+          class="border w-full p-2 rounded"
+          rows="2"
+          bind:value={rune}
+          placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
+        />
+      </div>
+      <!-- Connect Button -->
+      <div class="flex items-center justify-between w-full mt-4">
+        <button
+          on:click={connect}
+          disabled={!address}
+          class="border border-purple-500 rounded py-1 px-4 disabled:opacity-20 hover:shadow-md active:shadow-none"
+          >{$connectionStatus$ === 'connecting' ? '...' : 'Connect'}</button
+        >
+
+        {#if connectionStatus$}
+          <div class="flex items-center">
+            <div class="text-sm">{$connectionStatus$}</div>
+            <div
+              class:bg-green-500={$connectionStatus$ === 'connected'}
+              class:bg-yellow-500={$connectionStatus$ === 'connecting' ||
+                $connectionStatus$ === 'waiting_reconnect'}
+              class:bg-red-500={$connectionStatus$ === 'disconnected'}
+              class="w-3 h-3 rounded-full ml-1 transition-colors"
+            />
+          </div>
+        {/if}
+      </div>
+    </div>
+  </div>
+{/if}
