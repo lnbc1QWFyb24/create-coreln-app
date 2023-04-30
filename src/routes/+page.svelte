@@ -4,6 +4,8 @@
   import Header from '../components/Header.svelte'
   import Slide from '../components/Slide.svelte'
   import { goto } from '$app/navigation'
+  import type { Info, Prism } from '../types.js'
+
 
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
@@ -18,9 +20,12 @@
     }
   }
 
-  let address = ''
-  let rune = ''
+  // let address = ''
+  // let rune = ''
+  let address = '0211339e6b9db0e7e14d19bcd612d06ba26f793e8d049ebe9a99a3966668f4d81f@localhost:7272'
+  let rune = '0Ew8MyncAizPDi6rs8fp4vJCl7mQYNA8fVew2lwTFnE9NQ=='
   let bolt12 = ''
+  let info: Info
 
   let modalOpen = false
   let connecting = false
@@ -73,9 +78,12 @@
     connecting = true
     await ln.connect()
     connecting = false
+
+    const infoResult = await request('getinfo')
+    info = infoResult as Info
   }
 
-  async function request(method: string, params: unknown): Promise<unknown> {
+  async function request(method: string, params?: unknown): Promise<unknown> {
     try {
       const result = await ln.commando({
         method,
@@ -90,17 +98,6 @@
     }
   }
 
-  type Member = {
-    name: string
-    destination: string
-    split: number
-  }
-
-  type Prism = {
-    label: string
-    members: Member[]
-  }
-
   async function createPrism(prism: Prism) {
     try {
       const result = await request('createprism', prism)
@@ -113,14 +110,14 @@
 
 <svelte:head>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap"
     rel="stylesheet"
   />
 </svelte:head>
 <main class="w-screen h-screen flex flex-col items-center justify-center relative">
-  <Header text="wooooo" {ln} />
+<Header {info} />
 
   <!-- Button to open connect modal -->
   {#if $connectionStatus$ !== 'connected' && !modalOpen}
