@@ -1,5 +1,6 @@
 <script lang="ts">
-  import Slide from './Slide.svelte'
+  import Button from './Button.svelte'
+import Slide from './Slide.svelte'
 
   type Slides = typeof slides
   type SlideStep = Slides[number]
@@ -61,7 +62,7 @@
 <div class="border max-w-lg w-full p-10">
   {#if slide === '0'}
     <Slide direction={slideDirection}>
-      <div class="mt-4 w-full text-sm">
+      <div class="mt-4 w-full text-sm slide-content">
         <label class="font-medium mb-1 block" for="address">Name your prism</label>
         <textarea
           id="address"
@@ -71,7 +72,7 @@
           placeholder=""
         />
       </div>
-      <button class="px-4 py-2 border rounded" on:click={() => next()}>Next</button>
+      <Button class="px-4 py-2 border rounded" on:click={() => next()}>Next</Button>
     </Slide>
   {/if}
   {#if slide === '1'}
@@ -80,7 +81,7 @@
       {#each members as member}
         <div class="flex flex-col flex-wrap border">
           <div class="m-2">
-            <div class="mt-4 w-full text-sm">
+            <div class="mt-4 w-full text-sm flex flex-col gap-4">
               <label class="font-medium mb-1 block" for="address">Name</label>
               <textarea
                 id="address"
@@ -118,13 +119,23 @@
         </div>
       {/each}
 
-      <button class="px-4 py-2 border rounded" on:click={() => next()}>Next</button>
+      <Button icon="ArrowRight" on:click={() => next()}>Next</Button>
     </Slide>
   {/if}
   {#if slide === '2'}
     <!-- // @TODO - send values to create-prism method -->
     <Slide direction={slideDirection}
-      ><button class="px-4 py-2 border rounded" on:click={() => back()}>Back</button>Finish</Slide
+      ><Button format="secondary" on:click={() => back()}>Back</Button>Finish</Slide
     >
   {/if}
 </div>
+
+<style>
+  label {
+    @apply text-lg font-bold;
+  }
+
+  .slide-content {
+    @apply flex flex-col gap-4;
+  }
+</style>
