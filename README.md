@@ -39,6 +39,6 @@ npm i
 npm run dev
 ```
 
-4. Open up [http://localhost:5173](http://localhost:5173) in your browser
+4. Open [http://localhost:5173](http://localhost:5173) in your browser
 
-5. Follow the instructions at [https://github.com/daGoodenough/ROYGBIV-backend](https://github.com/daGoodenough/ROYGBIV-backend) to set up the backend. 
+5. Follow the instructions at [https://github.com/daGoodenough/ROYGBIV-backend](https://github.com/daGoodenough/ROYGBIV-backend) to set up the backend
