@@ -14,9 +14,9 @@ BOLT 12 offers are static QR payment codes that can be reused again and again. C
 - Started on Polar, but ultimately had to move to Docker.
 
 ## Coming Soon:
-- Add functionality to edit existing prisms: add or remove members, change share amounts, etc.
-- Add support for split payments to other BOLT 12 offers, LNURL, AMP, and Lightning Addresses. 
-- Add different payout strategies, such as payment amount thresholds and time-based payouts.
+- Functionality to edit existing prisms: add or remove members, change share amounts, etc.
+- Support for split payments to other BOLT 12 offers, LNURL, AMP, and Lightning Addresses. 
+- Different payout strategies, such as payment amount thresholds and time-based payouts.
 
 ## Install Instructions:
 
