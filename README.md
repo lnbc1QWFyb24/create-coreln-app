@@ -10,13 +10,13 @@ This repository contains a progressive web app - the frontend component to ROYGB
 BOLT 12 offers are static QR payment codes that can be reused again and again. Currently, ROYGBIV supports prism payouts to node pubkeys via keysend.
 
 ## Challenges:
-- Core Lightning plugin local development environment.
-- Started on Polar, but ultimately had to move to Docker.
+- Core Lightning plugin local development environment
+- Started on Polar, but ultimately had to move to Docker
 
 ## Coming Soon:
 - Functionality to edit existing prisms: add or remove members, change share amounts, etc.
-- Support for split payments to other BOLT 12 offers, LNURL, AMP, and Lightning Addresses. 
-- Different payout strategies, such as payment amount thresholds and time-based payouts.
+- Support for split payments to other BOLT 12 offers, LNURL, AMP, and Lightning Addresses 
+- Different payout strategies, such as payment amount thresholds and time-based payouts
 
 ## Install Instructions:
 
