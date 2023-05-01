@@ -16,7 +16,7 @@ BOLT 12 offers are static QR payment codes that can be reused again and again. C
 
 ## Install Instructions
 
-1. Clone (or fork) ROYGBIV:
+1. Clone (or fork) ROYGBIV
 
 ```bash
 git clone https://github.com/johngribbin/ROYGBIV-frontend.git
