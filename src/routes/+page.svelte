@@ -30,7 +30,7 @@
   let bolt12 = ''
   let info: Info
 
-  let modalOpen: 'connect' | 'qr' | null = null
+  let modalOpen: 'connect' | 'qr' | null = 'connect'
   let connecting = false
 
   async function connect() {
@@ -139,7 +139,7 @@
 {#if modalOpen === 'connect'}
   <div
     transition:fade
-    class="w-full h-full bg-black absolute top-0 bg-black/30 flex flex-col items-center justify-center z-10"
+    class="w-full h-full bg-black absolute top-0 bg-black/30 flex flex-col items-center justify-center z-10 p-6"
   >
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
@@ -150,10 +150,10 @@
         <Icon icon="Cross" />
       </div>
     </div>
-    <div class="w-1/2 max-w-lg border-2 p-6 rounded relative bg-black">
-      <h1 class="text-lg">Connect your Node</h1>
+    <div class="w-1/2 max-w-lg border-2 p-8 rounded relative bg-black w-full">
+      <h1 class="text-4xl">Connect your node</h1>
       <!-- Address -->
-      <div class="mt-4 w-full text-sm">
+      <div class="mt-8 w-full text-sm">
         <label class="font-medium mb-1 block" for="address">Address</label>
         <textarea
           id="address"
@@ -164,7 +164,7 @@
         />
       </div>
       <!-- Rune -->
-      <div class="w-full mt-4 text-sm">
+      <div class="w-full mt-8 text-sm">
         <label class="font-medium mb-1 block" for="rune">Rune</label>
         <textarea
           id="rune"
@@ -175,8 +175,8 @@
         />
       </div>
       <!-- Connect Button -->
-      <div class="flex items-center justify-between w-full mt-4">
-        <Button on:click={connect} disabled={!address}>
+      <div class="mt-8">
+        <Button fullWidth={true} on:click={connect} disabled={!address}>
           {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
         </Button>
       </div>
@@ -203,9 +203,3 @@
     </div>
   </div>
 {/if}
-
-<style>
-  h2 {
-    @apply font-bold text-lg;
-  }
-</style>
