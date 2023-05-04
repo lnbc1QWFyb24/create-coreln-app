@@ -105,30 +105,34 @@
 </svelte:head>
 <main class="w-screen h-screen flex flex-col items-center justify-center relative">
   <Header {info} />
+  <!-- Content Container -->
+  <div class="max-w-4xl">
+    <!-- Animation -->
+    {#if !info}
+      <div class="flex justify-center max-w-lg">
+        <!-- svelte-ignore a11y-media-has-caption -->
+        <video src="triangle.mp4" poster="triangle.jpg" autoplay loop>ROYGBIV</video>
+      </div>
+    {/if}
 
-  {#if !info}
-    <div class="mb-8 flex justify-center">
-      <video src="triangle.mp4" poster="triangle.jpg" autoplay loop class="w-2/3"> ROYGBIV </video>
-    </div>
-  {/if}
+    <!-- Button to open connect modal -->
+    {#if $connectionStatus$ !== 'connected' && !modalOpen}
+      <div class="flex flex-col items-center justify-center bg-black">
+        <Button on:click={() => (modalOpen = 'connect')} icon="ArrowUpCircle">Connect</Button>
 
-  <!-- Button to open connect modal -->
-  {#if $connectionStatus$ !== 'connected' && !modalOpen}
-    <div class="flex flex-col items-center justify-center bg-black">
-      <Button on:click={() => (modalOpen = 'connect')} icon="ArrowUpCircle">Connect</Button>
+        <p class="max-w-md mt-8 text-center">
+          ROYGBIV creates lightning prisms, which are special BOLT12 offers. Any payments received
+          to these offers will split out to multiple recipients. Connect your Core Lightning node to
+          get started.
+        </p>
+      </div>
+    {/if}
 
-      <p class="max-w-md mt-8 text-center">
-        ROYGBIV creates lightning prisms, which are special BOLT12 offers. Any payments received to
-        these offers will split out to multiple recipients. Connect your Core Lightning node to get
-        started.
-      </p>
-    </div>
-  {/if}
-
-  <!-- Prism Steps -->
-  {#if $connectionStatus$ === 'connected'}
-    <Steps finish={(prism) => createPrism(prism)} />
-  {/if}
+    <!-- Prism Steps -->
+    {#if $connectionStatus$ === 'connected'}
+      <Steps finish={(prism) => createPrism(prism)} />
+    {/if}
+  </div>
 </main>
 
 <!-- Connect Modal -->
