@@ -9,7 +9,6 @@
   import close from '../icons/close.js'
   import Button from '../components/Button.svelte'
   import Icon from '../components/Icon/Icon.svelte'
-  import prism from '../icons/prism.js'
   import Triangle from '../components/Triangle.svelte'
 
   let ln: Lnmessage
@@ -30,7 +29,7 @@
   let bolt12 = ''
   let info: Info
 
-  let modalOpen: 'connect' | 'qr' | null = 'connect'
+  let modalOpen: 'connect' | 'qr' | null = null
   let connecting = false
 
   async function connect() {
@@ -106,7 +105,7 @@
 <main class="w-screen h-screen flex flex-col items-center justify-center relative">
   <Header {info} />
   <!-- Content Container -->
-  <div class="max-w-4xl">
+  <div class="max-w-4xl p-6">
     <!-- Animation -->
     {#if !info}
       <div class="flex justify-center max-w-lg">
@@ -150,10 +149,10 @@
         <Icon icon="Cross" />
       </div>
     </div>
-    <div class="w-1/2 max-w-lg border-2 p-8 rounded relative bg-black w-full">
+    <div class="max-w-lg border-2 p-8 rounded relative bg-black w-full">
       <h1 class="text-4xl">Connect your node</h1>
       <!-- Address -->
-      <div class="mt-8 w-full text-sm">
+      <div class="mt-6 w-full text-sm">
         <label class="font-medium mb-1 block" for="address">Address</label>
         <textarea
           id="address"
@@ -164,7 +163,7 @@
         />
       </div>
       <!-- Rune -->
-      <div class="w-full mt-8 text-sm">
+      <div class="w-full mt-6 text-sm">
         <label class="font-medium mb-1 block" for="rune">Rune</label>
         <textarea
           id="rune"

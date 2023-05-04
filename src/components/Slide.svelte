@@ -6,7 +6,6 @@
 
   export let back: (() => void) | null = null
   export let direction: 'left' | 'right' = 'left'
-  export let backText: string | undefined = undefined
 
   let mounted = false
 
@@ -24,12 +23,15 @@
 </script>
 
 {#if mounted}
-  <div class="">
+  <div>
     {#if back}
       <BackButton on:click={back} />
     {/if}
 
-    <div in:fly|local={{ x, duration: 250 }} class="flex flex-col gap-4 justify-center h-full overflow-auto">
+    <div
+      in:fly|local={{ x, duration: 250 }}
+      class="flex flex-col justify-center h-full overflow-auto"
+    >
       <slot />
     </div>
   </div>
