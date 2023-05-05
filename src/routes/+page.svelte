@@ -9,7 +9,6 @@
   import close from '../icons/close.js'
   import Button from '../components/Button.svelte'
   import Icon from '../components/Icon/Icon.svelte'
-  import prism from '../icons/prism.js'
   import Triangle from '../components/Triangle.svelte'
 
   let ln: Lnmessage
@@ -106,36 +105,41 @@
 <main class="w-screen h-screen flex flex-col items-center justify-center relative">
   <Header {info} />
 
-  {#if !info}
-    <div class="mb-8 flex justify-center">
-      <video src="triangle.mp4" poster="triangle.jpg" autoplay loop class="w-2/3"> ROYGBIV </video>
-    </div>
-  {/if}
+  <!-- Content Container -->
+  <div class="max-w-4xl p-6">
+    <!-- Animation -->
+    {#if !info}
+      <div class="flex justify-center max-w-lg">
+        <!-- svelte-ignore a11y-media-has-caption -->
+        <video src="triangle.mp4" poster="triangle.jpg" autoplay loop>ROYGBIV</video>
+      </div>
+    {/if}
 
-  <!-- Button to open connect modal -->
-  {#if $connectionStatus$ !== 'connected' && !modalOpen}
-    <div class="flex flex-col items-center justify-center bg-black">
-      <Button on:click={() => (modalOpen = 'connect')} icon="ArrowUpCircle">Connect</Button>
+    <!-- Button to open connect modal -->
+    {#if $connectionStatus$ !== 'connected' && !modalOpen}
+      <div class="flex flex-col items-center justify-center bg-black">
+        <Button on:click={() => (modalOpen = 'connect')} icon="ArrowUpCircle">Connect</Button>
 
-      <p class="max-w-md mt-8 text-center">
-        ROYGBIV creates lightning prisms, which are special BOLT12 offers. Any payments received to
-        these offers will split out to multiple recipients. Connect your Core Lightning node to get
-        started.
-      </p>
-    </div>
-  {/if}
+        <p class="max-w-md mt-8 text-center">
+          ROYGBIV creates lightning prisms, which are special BOLT12 offers. Any payments received
+          to these offers will split out to multiple recipients. Connect your Core Lightning node to
+          get started.
+        </p>
+      </div>
+    {/if}
 
-  <!-- Prism Steps -->
-  {#if $connectionStatus$ === 'connected'}
-    <Steps finish={(prism) => createPrism(prism)} />
-  {/if}
+    <!-- Prism Steps -->
+    {#if $connectionStatus$ === 'connected'}
+      <Steps finish={(prism) => createPrism(prism)} />
+    {/if}
+  </div>
 </main>
 
 <!-- Connect Modal -->
 {#if modalOpen === 'connect'}
   <div
     transition:fade
-    class="w-full h-full bg-black absolute top-0 bg-black/30 flex flex-col items-center justify-center z-10"
+    class="w-full h-full bg-black absolute top-0 bg-black/30 flex flex-col items-center justify-center z-10 p-6"
   >
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
@@ -146,10 +150,10 @@
         <Icon icon="Cross" />
       </div>
     </div>
-    <div class="w-1/2 max-w-lg border-2 p-6 rounded relative bg-black">
-      <h1 class="text-lg">Connect your Node</h1>
+    <div class="max-w-lg border-2 p-8 rounded relative bg-black w-full">
+      <h1 class="text-4xl">Connect your node</h1>
       <!-- Address -->
-      <div class="mt-4 w-full text-sm">
+      <div class="mt-6 w-full text-sm">
         <label class="font-medium mb-1 block" for="address">Address</label>
         <textarea
           id="address"
@@ -160,7 +164,7 @@
         />
       </div>
       <!-- Rune -->
-      <div class="w-full mt-4 text-sm">
+      <div class="w-full mt-6 text-sm">
         <label class="font-medium mb-1 block" for="rune">Rune</label>
         <textarea
           id="rune"
@@ -171,8 +175,8 @@
         />
       </div>
       <!-- Connect Button -->
-      <div class="flex items-center justify-between w-full mt-4">
-        <Button on:click={connect} disabled={!address}>
+      <div class="mt-8">
+        <Button fullWidth={true} on:click={connect} disabled={!address}>
           {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
         </Button>
       </div>
@@ -199,9 +203,3 @@
     </div>
   </div>
 {/if}
-
-<style>
-  h2 {
-    @apply font-bold text-lg;
-  }
-</style>
