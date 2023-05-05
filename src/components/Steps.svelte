@@ -109,7 +109,7 @@
 <!-- Add prism members  -->
 {#if slide === '1'}
   <Slide direction={slideDirection}>
-    <h1 class="text-3xl mb-6 text-center">Select Prism Members</h1>
+    <h1 class="text-3xl mb-6 text-center">Choose Prism Members</h1>
     <div class="flex flex-row gap-6 w-full">
       {#each members as member, i}
         <div class="flex flex-col border rounded p-6 w-96 overflow">
@@ -123,44 +123,46 @@
               </div>
             {/if}
           </div>
-          <!-- Name -->
-          <div class="mt-6 w-full flex flex-col">
-            <label class="mb-1 block" for="address">Name</label>
-            <textarea
-              id="address"
-              class="border w-full p-2 rounded w-full"
-              rows="1"
-              cols="200"
-              bind:value={member.name}
-              placeholder=""
-            />
+          <!-- Name, Split & Share (%) -->
+          <div class="flex flex-between items-center gap-4">
+            <!-- Name -->
+            <div class="mt-6 w-full">
+              <label class="mb-1 block" for="name">Name</label>
+              <input
+                id="name"
+                class="border w-full p-2 rounded"
+                type="text"
+                bind:value={member.name}
+                placeholder="Alice"
+              />
+            </div>
+            <!-- Split -->
+            <div class="mt-6">
+              <label class="mb-1 block" for="split">Split</label>
+              <input
+                id="split"
+                class="border w-full p-2 rounded"
+                type="number"
+                bind:value={member.split}
+                placeholder="weight"
+              />
+            </div>
+            <!-- Share -->
+            <div class="mt-6 w-20">
+              <label class="mb-1 block" for="percentage">Share</label>
+              <p class="p-2 pl-0">{member.percentage.toFixed(1)}%</p>
+            </div>
           </div>
           <!-- Destination -->
-          <div class="mt-6 w-full text-sm">
-            <label class="mb-1 block" for="address">Destination</label>
+          <div class="mt-6">
+            <label class="mb-1 block" for="destination">Destination</label>
             <textarea
-              id="address"
+              id="destination"
               class="border w-full p-2 rounded"
               rows="1"
               bind:value={member.destination}
               placeholder="pubkey"
             />
-          </div>
-          <!-- Split -->
-          <div class="mt-6 w-full text-sm">
-            <label class="mb-1 block" for="address">Split</label>
-            <input
-              id="address"
-              class="border w-full p-2 rounded"
-              type="number"
-              bind:value={member.split}
-              placeholder="weight"
-            />
-          </div>
-          <!-- Percentage -->
-          <div class="mt-6 w-full text-sm">
-            <label class="mb-1 block" for="address">Share</label>
-            {member.percentage.toFixed(1)}%
           </div>
         </div>
       {/each}
