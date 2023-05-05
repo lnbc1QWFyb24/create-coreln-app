@@ -104,6 +104,7 @@
 </svelte:head>
 <main class="w-screen h-screen flex flex-col items-center justify-center relative">
   <Header {info} />
+
   <!-- Content Container -->
   <div class="max-w-4xl p-6">
     <!-- Animation -->

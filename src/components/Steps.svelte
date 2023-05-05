@@ -1,5 +1,7 @@
 <script lang="ts">
   import Button from './Button.svelte'
+  import Icon from './Icon/Icon.svelte'
+  import close from '../icons/close.js'
   import Slide from './Slide.svelte'
 
   export let finish = (args: any) => {} // no-operation function
@@ -9,7 +11,7 @@
   type SlideDirection = 'right' | 'left'
 
   const slides = ['0', '1', '2'] as const
-  let slide: SlideStep = '0'
+  let slide: SlideStep = '1'
   let previousSlide: SlideStep = '0'
   let incomplete = true
 
@@ -47,10 +49,9 @@
 
   $: {
     incomplete = members.some((member) => !member.name || !member.destination || !member.split)
-    console.log('incomplete = ', incomplete)
   }
 
-  // Calaculate percentages for each member
+  // Calculate percentages for each member
   $: {
     if (members) {
       const allSplits = members.map((member) => member.split).reduce((a, b) => a + b)
@@ -65,8 +66,21 @@
     }
   }
 
-  // @TODO
-  function addMember() {}
+  function addMember() {
+    members = [
+      ...members,
+      {
+        name: '',
+        destination: '',
+        split: 0,
+        percentage: 0
+      }
+    ]
+  }
+
+  function deleteMember(index: number) {
+    members = members.filter((member) => members.indexOf(member) !== index)
+  }
 </script>
 
 <!-- Name your prism -->
@@ -86,19 +100,32 @@
       </div>
     </div>
     <div class="mt-8">
-      <Button format="secondary" fullWidth={true} on:click={() => next()}>Next</Button>
+      <Button disabled={!label} format="secondary" fullWidth={true} on:click={() => next()}
+        >Next</Button
+      >
     </div>
   </Slide>
 {/if}
 <!-- Add prism members  -->
 {#if slide === '1'}
   <Slide direction={slideDirection}>
-    <div class="flex flex-row gap-4 w-full">
-      {#each members as member}
-        <div class="flex flex-wrap border border basis-1/2 p-6">
-          <div class="mt-4 w-full text-sm flex flex-col gap-4">
-            <h3>Member</h3>
-            <label class="font-medium mb-1 block" for="address">Name</label>
+    <h1 class="text-3xl mb-6 text-center">Select Prism Members</h1>
+    <div class="flex flex-row gap-6 w-full">
+      {#each members as member, i}
+        <div class="flex flex-col border rounded p-6 w-96 overflow">
+          <!-- Header -->
+          <div class="flex justify-between w-full">
+            <h3 class="text-2xl">Member {i + 1}</h3>
+            {#if members.length > 2}
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <div class="w-8 cursor-pointer" on:click={() => deleteMember(i)}>
+                <Icon icon="Cross" />
+              </div>
+            {/if}
+          </div>
+          <!-- Name -->
+          <div class="mt-6 w-full flex flex-col">
+            <label class="mb-1 block" for="address">Name</label>
             <textarea
               id="address"
               class="border w-full p-2 rounded w-full"
@@ -108,8 +135,9 @@
               placeholder=""
             />
           </div>
-          <div class="mt-4 w-full text-sm">
-            <label class="font-medium mb-1 block" for="address">Destination</label>
+          <!-- Destination -->
+          <div class="mt-6 w-full text-sm">
+            <label class="mb-1 block" for="address">Destination</label>
             <textarea
               id="address"
               class="border w-full p-2 rounded"
@@ -118,8 +146,9 @@
               placeholder="pubkey"
             />
           </div>
-          <div class="mt-4 w-full text-sm">
-            <label class="font-medium mb-1 block" for="address">Split</label>
+          <!-- Split -->
+          <div class="mt-6 w-full text-sm">
+            <label class="mb-1 block" for="address">Split</label>
             <input
               id="address"
               class="border w-full p-2 rounded"
@@ -128,8 +157,9 @@
               placeholder="weight"
             />
           </div>
-          <div class="mt-4 w-full text-sm">
-            <label class="font-medium mb-1 block" for="address">Share</label>
+          <!-- Percentage -->
+          <div class="mt-6 w-full text-sm">
+            <label class="mb-1 block" for="address">Share</label>
             {member.percentage.toFixed(1)}%
           </div>
         </div>
@@ -137,6 +167,7 @@
     </div>
     <div class="mt-8 flex w-full justify-between">
       <Button format="secondary" on:click={() => back()}>Back</Button>
+      <Button format="primary" on:click={() => addMember()}>+1</Button>
       <Button disabled={incomplete} format="secondary" on:click={() => next()}>Next</Button>
     </div>
   </Slide>
@@ -157,7 +188,7 @@
         />
       </div> -->
     </div>
-    <div class="flex gap-2 w-full items-end justify-end">
+    <div class="flex w-full items-end justify-end">
       <Button format="secondary" on:click={() => back()}>Back</Button>
       <Button format="primary" on:click={() => finish({ label, members })}>Finish</Button>
     </div>

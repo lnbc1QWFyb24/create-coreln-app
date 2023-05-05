@@ -49,6 +49,10 @@
     @apply opacity-50;
   }
 
+  .secondary:disabled {
+    @apply opacity-50;
+  }
+
   .fill {
     @apply w-full;
   }
