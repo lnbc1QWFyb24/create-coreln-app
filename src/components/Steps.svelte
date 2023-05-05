@@ -1,7 +1,6 @@
 <script lang="ts">
   import Button from './Button.svelte'
   import Icon from './Icon/Icon.svelte'
-  import close from '../icons/close.js'
   import Slide from './Slide.svelte'
 
   export let finish = (args: any) => {} // no-operation function
@@ -124,8 +123,10 @@
             {/if}
           </div>
           <!-- Name, Split & Share (%) -->
+          <!-- @TODO - Update functionality to allow scrolling of prism members on x axis -->
           <div class="flex flex-between items-center gap-4">
             <!-- Name -->
+            <!-- @TODO input validation for name -->
             <div class="mt-6 w-full">
               <label class="mb-1 block" for="name">Name</label>
               <input
@@ -154,6 +155,7 @@
             </div>
           </div>
           <!-- Destination -->
+          <!-- TODO - input validation for pubkey -->
           <div class="mt-6">
             <label class="mb-1 block" for="destination">Destination</label>
             <textarea
