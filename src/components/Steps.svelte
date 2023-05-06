@@ -14,24 +14,22 @@
   let slides = [0, 1, 2, 3]
   let slide: SlideStep = 0
   let previousSlide: SlideStep = 0
-  let incompleteMember = true
-  let label: string = 'bitcoin-devs' // prism name
+  let label: string = '' // prism name
   let memberCount = 2 // minimum of 2 members in a prism
   let members: Member[] = []
 
   // Update members & slides based on member count input on first slide
   $: {
     members = new Array(memberCount).fill({
-      name: 'Alice',
-      destination: 'dsafasdf',
-      split: 1,
+      name: '',
+      destination: '',
+      split: 1, // Default to all members having same share
       percentage: 0
     })
 
     const memberSlides = Array.from({ length: memberCount }, (_, index) => index + 1)
 
     slides = [0, ...memberSlides, memberCount + 1]
-    console.log(slides)
   }
 
   // Calculate percentage values for each member
@@ -49,16 +47,16 @@
     }
   }
 
-  // Prevent moving to next slide when member details incomplete
-  $: {
-    incompleteMember = members.some(
-      (member) => !member.name || !member.destination || !member.split
-    )
-  }
-
   $: slideDirection = (
     slides.indexOf(previousSlide) > slides.indexOf(slide) ? 'right' : 'left'
   ) as SlideDirection
+
+  function isMemberIncomplete(member: Member) {
+    if (!member.name || !member.destination || !member.split) {
+      return true
+    }
+    return false
+  }
 
   function back() {
     previousSlide = slides[slides.indexOf(slide) - 2]
@@ -176,8 +174,10 @@
 
         <div class="mt-8 flex w-full justify-between">
           <Button format="secondary" on:click={() => back()}>Back</Button>
-          <Button disabled={incompleteMember} format="secondary" on:click={() => next()}
-            >Next</Button
+          <Button
+            disabled={isMemberIncomplete(members[i])}
+            format="secondary"
+            on:click={() => next()}>Next</Button
           >
         </div>
       </div>
@@ -188,15 +188,19 @@
 {#if slide === slides.length - 1}
   <Slide direction={slideDirection}>
     <div class="max-w-sm">
-      <h1 class="text-4xl">Summary</h1>
-      <p>{label} has {members.length} members. Please review before submission:</p>
-      {#each members as member}
-        <div>
-          <p>{member.name}</p>
-          <p>{member.percentage}</p>
-        </div>
-      {/each}
-      <div class="flex w-full items-end justify-end">
+      <p class="mt-4">
+        {label} has {members.length} members. Please review before creating your prism:
+      </p>
+      <div class="mt-6">
+        {#each members as member, i}
+          <div class="flex p-1">
+            <p class="mr-2">{i + 1})</p>
+            <p class="mr-2">{member.percentage.toFixed(2)}% -</p>
+            <p>{member.name}</p>
+          </div>
+        {/each}
+      </div>
+      <div class="mt-8 flex w-full justify-between">
         <Button format="secondary" on:click={() => back()}>Back</Button>
         <Button format="primary" on:click={() => finish({ label, members })}>Finish</Button>
       </div>
