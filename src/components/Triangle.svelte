@@ -48,8 +48,8 @@
     }
     const rainbowArray = Object.keys(rainbow)
     let startIndex = rainbowArray.indexOf(startColor)
-    console.log('startIndex: ' + startIndex)
-    console.log(rainbowArray)
+    // console.log('startIndex: ' + startIndex)
+    // console.log(rainbowArray)
 
     for (let i = 0; i < numColors; i++) {
       let index = startIndex++ % rainbowArray.length
