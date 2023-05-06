@@ -76,6 +76,7 @@
   })
 </script>
 
+<!-- @TODO - fix copy of bolt12 value -->
 <div
   in:fade|local={{ duration: 250 }}
   class="border-2 border-neutral-400 rounded-lg shadow-md max-w-full p-2 md:p-4 flex flex-col justify-center items-center relative"

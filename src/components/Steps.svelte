@@ -188,6 +188,7 @@
 {#if slide === slides.length - 1}
   <Slide direction={slideDirection}>
     <div class="max-w-sm">
+      <h1 class="text-4xl">Summary</h1>
       <p class="mt-4">
         {label} has {members.length} members. Please review before creating your prism:
       </p>
