@@ -4,6 +4,7 @@ export type Member = {
   name: string
   destination: string
   split: number
+  percentage: number
 }
 
 export type Prism = {
