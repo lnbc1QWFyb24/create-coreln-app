@@ -70,7 +70,6 @@
   })
 </script>
 
-<!-- @TODO - fix copy of bolt12 value -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
   on:click={copyBolt12}
