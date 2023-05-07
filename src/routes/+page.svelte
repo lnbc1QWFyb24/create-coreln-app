@@ -25,6 +25,7 @@
   }
 
   let address = '03093b030028e642fc3b9a05c8eb549f202958e92143da2e85579b92ef0f49cc7d@localhost:7272'
+  let websocketProxy = 'wss://wsproxy.clams.tech'
   let rune = 'SFTxHiGlQrB2H19h7gCPzLuml3-xroW-sloI84CXRek9NQ=='
   let bolt12 = ''
   let info: Info
@@ -40,7 +41,7 @@
       // The public key of the node you would like to connect to
       remoteNodePublicKey: publicKey,
       // WebSocket proxy endpoint to connect through if running in prod
-      // wsProxy: 'wss://<WEBSOCKET_PROXY>',
+      // wsProxy: websocketProxy,
       // The IP address of the node
       ip,
       // The port of the node, defaults to 9735
@@ -172,6 +173,16 @@
           rows="2"
           bind:value={rune}
           placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
+        />
+      </div>
+      <!-- WebSocket Proxy -->
+      <div class="mt-6 w-full text-sm">
+        <label class="font-medium mb-1 block" for="address">WebSocket Proxy</label>
+        <input
+          id="address"
+          class="border w-full p-2 rounded"
+          bind:value={websocketProxy}
+          placeholder="wss://wsproxy.clams.tech"
         />
       </div>
       <!-- Connect Button -->
