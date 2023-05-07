@@ -4,7 +4,7 @@
   import copy from '../icons/copy'
   import photo from '../icons/photo'
   import check from '../icons/check'
-  import { truncateValue } from '../utils'
+  import { truncateValue, writeClipboardValue } from '../utils'
   import { browser } from '$app/environment'
   import type QRCodeStyling from 'qr-code-styling'
 
@@ -55,19 +55,13 @@
   let copySuccess = false
   let copyTimeout: NodeJS.Timeout
 
-  async function copyImage() {
-    try {
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          'image/png': qrCode.getRawData() as Promise<Blob>
-        })
-      ])
+  async function copyBolt12() {
+    if (value) {
+      copySuccess = await writeClipboardValue(value)
 
-      copySuccess = true
-
-      copyTimeout = setTimeout(() => (copySuccess = false), 3000)
-    } catch (error) {
-      console.warn(error)
+      if (copySuccess) {
+        copyTimeout = setTimeout(() => (copySuccess = false), 3000)
+      }
     }
   }
 
@@ -77,13 +71,15 @@
 </script>
 
 <!-- @TODO - fix copy of bolt12 value -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
+  on:click={copyBolt12}
   in:fade|local={{ duration: 250 }}
-  class="border-2 border-neutral-400 rounded-lg shadow-md max-w-full p-2 md:p-4 flex flex-col justify-center items-center relative"
+  class="cursor-pointer border-2 border-neutral-400 rounded-lg shadow-md max-w-full p-2 md:p-4 flex flex-col justify-center items-center relative"
 >
   <div class="rounded overflow-hidden transition-opacity" bind:this={node} />
   <div class="absolute -bottom-9 right-0 mt-2 flex items-center gap-x-2">
-    <button on:click={copyImage} class="flex items-center">
+    <button on:click={copyBolt12} class="flex items-center">
       {#if copySuccess}
         <div in:fade|local={{ duration: 250 }} class="w-8 text-utility-success">{@html check}</div>
       {:else}

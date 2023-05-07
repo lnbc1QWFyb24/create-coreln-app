@@ -8,12 +8,6 @@ export function parseNodeAddress(address: string): ParsedNodeAddress {
   try {
     const [publicKey, host] = address.split('@')
     const [ip, port] = host.split(':')
-    console.log({
-      publicKey,
-      host,
-      ip,
-      port
-    })
     return { publicKey, ip, port: port ? parseInt(port) : undefined }
   } catch (error) {
     return {
@@ -43,4 +37,17 @@ export function validateParsedNodeAddress({ publicKey, ip, port }: ParsedNodeAdd
 
 export function truncateValue(val: string, length = 9): string {
   return val.length <= length ? val : `${val.slice(0, length)}...${val.slice(-length)}`
+}
+
+/**
+ *
+ * @returns boolean indicating if write was successful
+ */
+export async function writeClipboardValue(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch (error) {
+    return false
+  }
 }
