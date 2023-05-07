@@ -24,9 +24,11 @@
     }
   }
 
-  let address = '03093b030028e642fc3b9a05c8eb549f202958e92143da2e85579b92ef0f49cc7d@localhost:7272'
+  // let address = '03093b030028e642fc3b9a05c8eb549f202958e92143da2e85579b92ef0f49cc7d@localhost:7272'
+  let address = ''
   let addressError = ''
-  let rune = 'SFTxHiGlQrB2H19h7gCPzLuml3-xroW-sloI84CXRek9NQ=='
+  // let rune = 'SFTxHiGlQrB2H19h7gCPzLuml3-xroW-sloI84CXRek9NQ=='
+  let rune = ''
   let runeError = ''
   let websocketProxy = 'wss://wsproxy.clams.tech'
   let websocketProxyError = ''
@@ -46,7 +48,7 @@
       remoteNodePublicKey: publicKey,
       // WebSocket proxy endpoint to connect through if running in prod
       // @TODO uncomment for deployment
-      // wsProxy: websocketProxy,
+      wsProxy: websocketProxy,
       // The IP address of the node
       ip,
       // The port of the node, defaults to 9735
