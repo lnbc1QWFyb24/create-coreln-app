@@ -2,6 +2,7 @@
   import minus from '../icons/minus'
   import plus from '../icons/plus'
   import type { Member } from '../types'
+  import { nodePublicKeyRegex } from '../utils'
   import Button from './Button.svelte'
   import Slide from './Slide.svelte'
 
@@ -18,7 +19,6 @@
   let memberCount = 2 // minimum of 2 members in a prism
   let members: Member[] = []
   let labelError = '' // Prism label validation
-  const nodePublicKeyRegex = /[0-9a-fA-F]{66}/
 
   function back() {
     previousSlide = slides[slides.indexOf(slide) - 2]
@@ -80,11 +80,6 @@
       return true
     }
     return false
-  }
-
-  // @TODO Use on summary?
-  function deleteMember(index: number) {
-    members = members.filter((member) => members.indexOf(member) !== index)
   }
 
   $: slideDirection = (

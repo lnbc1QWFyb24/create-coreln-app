@@ -1,6 +1,6 @@
 <script lang="ts">
   import Lnmessage from 'lnmessage'
-  import { parseNodeAddress } from '../utils.js'
+  import { parseNodeAddress, validateParsedNodeAddress } from '../utils.js'
   import Header from '../components/Header.svelte'
   import Steps from '../components/Steps.svelte'
   import type { Info, Prism } from '../types.js'
@@ -25,8 +25,12 @@
   }
 
   let address = '03093b030028e642fc3b9a05c8eb549f202958e92143da2e85579b92ef0f49cc7d@localhost:7272'
-  let websocketProxy = 'wss://wsproxy.clams.tech'
+  let addressError = ''
   let rune = 'SFTxHiGlQrB2H19h7gCPzLuml3-xroW-sloI84CXRek9NQ=='
+  let runeError = ''
+  let websocketProxy = 'wss://wsproxy.clams.tech'
+  let websocketProxyError = ''
+  let connectDisabled = false
   let bolt12 = ''
   let info: Info
 
@@ -91,6 +95,42 @@
       // bolt12 = (result as { bolt12: string }).bolt12
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  // Address validation
+  $: {
+    if (validateParsedNodeAddress(parseNodeAddress(address)) === false) {
+      addressError = 'node address is invalid'
+    } else {
+      addressError = ''
+    }
+  }
+
+  // Rune validation
+  $: {
+    if (!rune.length) {
+      runeError = 'rune is required'
+    } else {
+      runeError = ''
+    }
+  }
+
+  // WebSocket Proxy validation
+  $: {
+    if (!websocketProxy.length) {
+      websocketProxyError = 'websocket proxy is required'
+    } else {
+      websocketProxyError = ''
+    }
+  }
+
+  // Disable connect button if any validation fails
+  $: {
+    if (addressError || runeError || websocketProxyError) {
+      connectDisabled = true
+    } else {
+      connectDisabled = false
     }
   }
 </script>
@@ -163,6 +203,10 @@
           bind:value={address}
           placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
         />
+        <!-- Address validation -->
+        {#if addressError}
+          <p class="mt-1 text-sm text-red-500">{addressError}</p>
+        {/if}
       </div>
       <!-- Rune -->
       <div class="w-full mt-6 text-sm">
@@ -174,6 +218,10 @@
           bind:value={rune}
           placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
         />
+        <!-- Address validation -->
+        {#if !rune.length}
+          <p class="mt-1 text-sm text-red-500">{runeError}</p>
+        {/if}
       </div>
       <!-- WebSocket Proxy -->
       <div class="mt-6 w-full text-sm">
@@ -187,7 +235,7 @@
       </div>
       <!-- Connect Button -->
       <div class="mt-8">
-        <Button fullWidth={true} on:click={connect} disabled={!address}>
+        <Button disabled={connectDisabled} fullWidth={true} on:click={connect}>
           {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
         </Button>
       </div>
