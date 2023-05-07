@@ -2,6 +2,7 @@
   import minus from '../icons/minus'
   import plus from '../icons/plus'
   import type { Member } from '../types'
+  import { nodePublicKeyRegex } from '../utils'
   import Button from './Button.svelte'
   import Slide from './Slide.svelte'
 
@@ -11,19 +12,89 @@
   type SlideStep = Slides[number]
   type SlideDirection = 'right' | 'left'
 
-  let slides = [0, 1, 2, 3]
+  let slides = [0, 1, 2, 3] // Default slides - Name your prism, two members, summary
   let slide: SlideStep = 0
   let previousSlide: SlideStep = 0
   let label: string = '' // prism name
   let memberCount = 2 // minimum of 2 members in a prism
   let members: Member[] = []
+  let labelError = '' // Prism label validation
+
+  function back() {
+    previousSlide = slides[slides.indexOf(slide) - 2]
+    slide = slides[slides.indexOf(slide) - 1]
+  }
+
+  function next(to = slides[slides.indexOf(slide) + 1]) {
+    previousSlide = slide
+    slide = to
+  }
+
+  // Member name validation
+  function validateName(name: string) {
+    if (name.includes(' ')) {
+      return 'name cannot have spaces'
+    }
+    if (
+      !members
+        .map((member) => member['name'])
+        .every((value, index, arr) => arr.indexOf(value) === index)
+    ) {
+      return 'name must be unique'
+    }
+    return ''
+  }
+
+  // Member destination validation
+  function validateDestination(destination: string) {
+    if (!nodePublicKeyRegex.test(destination)) {
+      return 'destination is invalid node public key'
+    }
+    return ''
+  }
+
+  // Member split destination
+  function validateSplit(split: number) {
+    if (split < 0.1) {
+      return 'split minimum value is 0.1'
+    }
+    if (split > 100) {
+      return 'split maximum value is 100'
+    }
+    if (!/^\d+(\.\d{1,2})?$/.test(split.toString())) {
+      return 'split is limited to two decimals'
+    }
+
+    return ''
+  }
+
+  // Disables next button on member slide
+  function isMemberInvalid(member: Member) {
+    if (
+      !member.name ||
+      !member.destination ||
+      !member.split ||
+      member.nameError ||
+      member.destinationError
+    ) {
+      return true
+    }
+    return false
+  }
+
+  $: slideDirection = (
+    slides.indexOf(previousSlide) > slides.indexOf(slide) ? 'right' : 'left'
+  ) as SlideDirection
 
   // Update members & slides based on member count input on first slide
   $: {
     members = new Array(memberCount).fill({
       name: '',
+      nameError: '',
       destination: '',
+      destinationError: '',
       split: 1, // Default to all members having same share
+      splitError: '',
       percentage: 0
     })
 
@@ -47,29 +118,22 @@
     }
   }
 
-  $: slideDirection = (
-    slides.indexOf(previousSlide) > slides.indexOf(slide) ? 'right' : 'left'
-  ) as SlideDirection
-
-  function isMemberIncomplete(member: Member) {
-    if (!member.name || !member.destination || !member.split) {
-      return true
+  // Prism label validation
+  $: {
+    if (label.includes(' ')) {
+      labelError = 'spaces not allowed'
+    } else {
+      labelError = ''
     }
-    return false
   }
 
-  function back() {
-    previousSlide = slides[slides.indexOf(slide) - 2]
-    slide = slides[slides.indexOf(slide) - 1]
-  }
-
-  function next(to = slides[slides.indexOf(slide) + 1]) {
-    previousSlide = slide
-    slide = to
-  }
-  // @TODO Use on summary?
-  function deleteMember(index: number) {
-    members = members.filter((member) => members.indexOf(member) !== index)
+  // Member validation
+  $: {
+    members.forEach((member) => {
+      member.nameError = member.name ? validateName(member.name) : ''
+      member.destinationError = member.destination ? validateDestination(member.destination) : ''
+      member.splitError = validateSplit(member.split)
+    })
   }
 </script>
 
@@ -85,6 +149,9 @@
         bind:value={label}
         placeholder="bitcoin-dev-fund"
       />
+      {#if labelError}
+        <p class="mt-1 text-sm text-red-500">{labelError}</p>
+      {/if}
       <!-- Member Count -->
       <h1 class="mt-8 text-4xl">Member count</h1>
       <div class="flex justify-around mt-4">
@@ -114,8 +181,11 @@
       </div>
 
       <div class="mt-8">
-        <Button disabled={!label} format="secondary" fullWidth={true} on:click={() => next()}
-          >Next</Button
+        <Button
+          disabled={!label || labelError !== ''}
+          format="secondary"
+          fullWidth={true}
+          on:click={() => next()}>Next</Button
         >
       </div>
     </div>
@@ -131,7 +201,6 @@
           <!-- Name, Split & Share (%) -->
           <div class="flex flex-between items-center gap-4">
             <!-- Name -->
-            <!-- @TODO input validation for name -->
             <div class="w-full">
               <label class="mb-1 block" for="name">Name</label>
               <input
@@ -149,6 +218,7 @@
                 id="split"
                 class="border w-full p-2 rounded"
                 type="number"
+                min="1"
                 bind:value={member.split}
               />
             </div>
@@ -158,8 +228,15 @@
               <p class="p-2 pl-0">{member.percentage.toFixed(1)}%</p>
             </div>
           </div>
+          <!-- Name field validation -->
+          {#if member.nameError}
+            <p class="mt-1 text-sm text-red-500">{member.nameError}</p>
+          {/if}
+          <!-- Split field validation -->
+          {#if member.splitError}
+            <p class="mt-1 text-sm text-red-500">{member.splitError}</p>
+          {/if}
           <!-- Destination -->
-          <!-- TODO - input validation for pubkey -->
           <div class="mt-6">
             <label class="mb-1 block" for="destination">Destination</label>
             <textarea
@@ -167,17 +244,18 @@
               class="border w-full p-2 rounded"
               rows="1"
               bind:value={member.destination}
-              placeholder="pubkey"
+              placeholder="node public key"
             />
+            {#if member.destinationError}
+              <p class="text-sm text-red-500">{member.destinationError}</p>
+            {/if}
           </div>
         </div>
-
+        <!-- Buttons -->
         <div class="mt-8 flex w-full justify-between">
           <Button format="secondary" on:click={() => back()}>Back</Button>
-          <Button
-            disabled={isMemberIncomplete(members[i])}
-            format="secondary"
-            on:click={() => next()}>Next</Button
+          <Button disabled={isMemberInvalid(members[i])} format="secondary" on:click={() => next()}
+            >Next</Button
           >
         </div>
       </div>
@@ -189,7 +267,7 @@
   <Slide direction={slideDirection}>
     <div class="max-w-sm">
       <h1 class="text-4xl">Summary</h1>
-      <p class="mt-4">
+      <p class="mt-4 text-md">
         {label} has {members.length} members. Please review before creating your prism:
       </p>
       <div class="mt-6">
