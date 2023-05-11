@@ -1,6 +1,15 @@
 <script lang="ts">
   import Lnmessage from 'lnmessage'
-  import { parseNodeAddress } from './utils.js'
+  import { parseNodeAddress } from '../utils.js'
+  import Header from '../components/Header.svelte'
+  import Steps from '../components/Steps.svelte'
+  import type { Info, Prism } from '../types.js'
+  import { fade } from 'svelte/transition'
+  import Qr from '../components/QR.svelte'
+  import close from '../icons/close.js'
+  import Button from '../components/Button.svelte'
+  import Icon from '../components/Icon/Icon.svelte'
+  import Triangle from '../components/Triangle.svelte'
 
   let ln: Lnmessage
   let connectionStatus$: Lnmessage['connectionStatus$']
@@ -9,11 +18,19 @@
     connectionStatus$ = ln.connectionStatus$
   }
 
-  let address: string
-  let rune: string
-  let method: string
-  let params: string
-  let result: string
+  $: {
+    if ($connectionStatus$ === 'connected') {
+      modalOpen = null
+    }
+  }
+
+  let address = '03093b030028e642fc3b9a05c8eb549f202958e92143da2e85579b92ef0f49cc7d@localhost:7272'
+  let rune = 'SFTxHiGlQrB2H19h7gCPzLuml3-xroW-sloI84CXRek9NQ=='
+  let bolt12 = ''
+  let info: Info
+
+  let modalOpen: 'connect' | 'qr' | null = null
+  let connecting = false
 
   async function connect() {
     const { publicKey, ip, port } = parseNodeAddress(address)
@@ -38,125 +55,151 @@
     })
 
     // initiate the connection to the remote node
+    connecting = true
     await ln.connect()
+    connecting = false
+    modalOpen = null
+
+    const infoResult = await request('getinfo')
+    info = infoResult as Info
   }
 
-  async function request() {
-    let parsedParams: unknown | undefined
-
+  async function request(method: string, params?: unknown): Promise<unknown> {
     try {
-      parsedParams = params ? JSON.parse(params) : undefined
-
-      const requestResult = await ln.commando({
+      const result = await ln.commando({
         method,
-        params: parsedParams,
+        params,
         rune
       })
 
-      result = JSON.stringify(requestResult, null, 2)
+      return result
     } catch (error) {
       const { message } = error as { message: string }
-      alert(message)
-      return
+      console.log(message)
+    }
+  }
+
+  async function createPrism(prism: Prism) {
+    try {
+      // @TODO create bolt12 using the prism details
+      const result =
+        'lno1qgsqvgnwgcg35z6ee2h3yczraddm72xrfua9uve2rlrm9deu7xyfzrc2q32xjurnzgpyzsskyyppzvu7dwwmpelpf5vme4sj6p46ymme86xsf847n2v689nxdr6ds8c'
+      bolt12 = result
+      modalOpen = 'qr'
+      // const result = await request('createprism', prism)
+      // bolt12 = (result as { bolt12: string }).bolt12
+    } catch (error) {
+      console.log(error)
     }
   }
 </script>
 
-<main class="w-screen h-screen flex items-center justify-center p-6 relative">
-  {#if ln}
-    <div class="absolute top-1 right-1 px-2 py-1 border-green-600 rounded border text-sm">
-      Browser Id: {`${ln.publicKey.slice(0, 8)}...${ln.publicKey.slice(-8)}`}
-    </div>
-  {/if}
+<svelte:head>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap"
+    rel="stylesheet"
+  />
+</svelte:head>
+<main class="w-screen h-screen flex flex-col items-center justify-center relative">
+  <Header {info} />
 
-  <div class="w-1/2 max-w-lg">
-    <h1 class="font-bold text-3xl mb-4 w-full text-center">Create CoreLN App</h1>
-    <div class="w-full mt-4 text-sm p-4 border-2 rounded border-purple-300">
-      <label class="text-neutral-600 font-medium mb-1 block" for="address">Address</label>
-      <textarea
-        id="address"
-        class="border w-full p-2 rounded"
-        rows="3"
-        bind:value={address}
-        placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
-      />
-
-      <div class="flex items-center justify-between w-full">
-        <button
-          on:click={connect}
-          disabled={!address}
-          class="mt-2 border border-purple-500 rounded py-1 px-4 disabled:opacity-20 hover:shadow-md active:shadow-none"
-          >Connect</button
-        >
-
-        {#if connectionStatus$}
-          <div class="flex items-center">
-            <div class="text-sm">{$connectionStatus$}</div>
-            <div
-              class:bg-green-500={$connectionStatus$ === 'connected'}
-              class:bg-yellow-500={$connectionStatus$ === 'connecting' ||
-                $connectionStatus$ === 'waiting_reconnect'}
-              class:bg-red-500={$connectionStatus$ === 'disconnected'}
-              class="w-3 h-3 rounded-full ml-1 transition-colors"
-            />
-          </div>
-        {/if}
+  <!-- Content Container -->
+  <div class="max-w-4xl p-6">
+    <!-- Animation -->
+    {#if !info}
+      <div class="flex justify-center max-w-lg">
+        <!-- svelte-ignore a11y-media-has-caption -->
+        <video src="triangle.mp4" poster="triangle.jpg" autoplay loop>ROYGBIV</video>
       </div>
-    </div>
+    {/if}
 
-    <div class="w-full mt-8 text-sm p-4 border-2 rounded border-yellow-300">
-      <label class="text-neutral-600 font-medium mb-1 block" for="rune">Rune</label>
-      <textarea
-        id="rune"
-        class="border w-full p-2 rounded"
-        rows="2"
-        bind:value={rune}
-        placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
-      />
-    </div>
+    <!-- Button to open connect modal -->
+    {#if $connectionStatus$ !== 'connected' && !modalOpen}
+      <div class="flex flex-col items-center justify-center bg-black">
+        <Button on:click={() => (modalOpen = 'connect')} icon="ArrowUpCircle">Connect</Button>
 
-    <div class="p-4 border-2 rounded border-orange-300 mt-8">
-      <div class="w-full text-sm">
-        <label class="text-neutral-600 font-medium mb-1 block" for="method">Method</label>
-        <input
-          id="method"
-          class="border w-full p-2 rounded"
-          type="text"
-          bind:value={method}
-          placeholder="getinfo"
-        />
+        <p class="max-w-md mt-8 text-center">
+          ROYGBIV creates lightning prisms, which are special BOLT12 offers. Any payments received
+          to these offers will split out to multiple recipients. Connect your Core Lightning node to
+          get started.
+        </p>
       </div>
+    {/if}
 
-      <div class="w-full mt-4 text-sm">
-        <label class="text-neutral-600 font-medium mb-1 block" for="params">Params</label>
-        <textarea
-          id="params"
-          class="border w-full p-2 rounded"
-          rows="4"
-          bind:value={params}
-          placeholder={JSON.stringify({ key: 'value' }, null, 2)}
-        />
-      </div>
-
-      <button
-        on:click={request}
-        disabled={!connectionStatus$ || !rune || !method}
-        class="mt-2 border border-purple-500 rounded py-1 px-4 disabled:opacity-20 hover:shadow-md active:shadow-none"
-        >Request</button
-      >
-    </div>
-  </div>
-
-  <div class="w-1/2 max-w-xl p-4 border-2 rounded border-green-300 ml-4">
-    <div class="w-full text-sm">
-      <label class="text-neutral-600 font-medium mb-1 block" for="params">Result</label>
-      <textarea
-        id="params"
-        class="border w-full p-2 rounded"
-        rows="20"
-        value={result || ''}
-        placeholder={JSON.stringify({ key: 'value' }, null, 2)}
-      />
-    </div>
+    <!-- Prism Steps -->
+    {#if $connectionStatus$ === 'connected'}
+      <Steps finish={(prism) => createPrism(prism)} />
+    {/if}
   </div>
 </main>
+
+<!-- Connect Modal -->
+{#if modalOpen === 'connect'}
+  <div
+    transition:fade
+    class="w-full h-full bg-black absolute top-0 bg-black/30 flex flex-col items-center justify-center z-10 p-6"
+  >
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div
+      class="p-4 cursor-pointer absolute top-4 right-4 text-white"
+      on:click={() => (modalOpen = null)}
+    >
+      <div class="w-6 h-6">
+        <Icon icon="Cross" />
+      </div>
+    </div>
+    <div class="max-w-lg border-2 p-8 rounded relative bg-black w-full">
+      <h1 class="text-4xl">Connect your node</h1>
+      <!-- Address -->
+      <div class="mt-6 w-full text-sm">
+        <label class="font-medium mb-1 block" for="address">Address</label>
+        <textarea
+          id="address"
+          class="border w-full p-2 rounded"
+          rows="3"
+          bind:value={address}
+          placeholder="033f4bbfcd67bd0fc858499929a3255d063999ee23f4c5e12b8b1089e132b3e408@localhost:7272"
+        />
+      </div>
+      <!-- Rune -->
+      <div class="w-full mt-6 text-sm">
+        <label class="font-medium mb-1 block" for="rune">Rune</label>
+        <textarea
+          id="rune"
+          class="border w-full p-2 rounded"
+          rows="2"
+          bind:value={rune}
+          placeholder="O2osJxV-6lGUgAf-0NllduniYbq1Zkn-45trtbx4qAE9MA=="
+        />
+      </div>
+      <!-- Connect Button -->
+      <div class="mt-8">
+        <Button fullWidth={true} on:click={connect} disabled={!address}>
+          {$connectionStatus$ === 'connecting' ? '...' : 'Connect'}
+        </Button>
+      </div>
+    </div>
+  </div>
+{/if}
+
+<!-- QR Modal -->
+{#if modalOpen === 'qr'}
+  <div
+    transition:fade
+    class="flex w-full h-full top-0 absolute backdrop-blur-sm bg-black/30 flex flex-col items-center justify-center z-10"
+  >
+    <button
+      class="w-8 cursor-pointer absolute top-4 right-4 z-[99]"
+      on:click={() => (modalOpen = null)}
+    >
+      {@html close}
+    </button>
+
+    <Triangle />
+    <div class="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center">
+      <Qr value={bolt12} />
+    </div>
+  </div>
+{/if}
